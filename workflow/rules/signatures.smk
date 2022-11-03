@@ -26,7 +26,7 @@ rule plot_oi_s2rplus_te_gsea:
 
 rule gene_group_gsea:
     input:
-        lms = rules.filter_models.output.filtered_tsv,
+        lms = rules.filter_models.output.merged_tsv,
         tfs = "data/Drosophila_melanogaster_TF.txt",
         cofacs = "data/Drosophila_melanogaster_TF_cofactors.txt",
         pirna = rules.make_pirna_gene_list.output.tsv,

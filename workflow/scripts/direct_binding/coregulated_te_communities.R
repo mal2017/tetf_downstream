@@ -6,6 +6,11 @@ library(BiocNeighbors)
 library(igraph)
 library(paletteer)
 
+#tfs_path <- "data/Drosophila_melanogaster_TF.txt"
+tfs_path <- snakemake@input[["tfs"]]
+tfs <- read_tsv(tfs_path) %>% pull(Ensembl)
+
+
 #lkup_path <- "results/resources/gene_symbol_lookup.tsv.gz"
 lkup_path <- snakemake@input[["lkup"]]
 

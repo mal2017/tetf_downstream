@@ -13,7 +13,7 @@ library(fgsea)
 
 
 
-#lms_path <- "results/analysis/coexpression/filtered_models.tsv.gz"
+#lms_path <- "results/resources/filtered_models.tsv.gz"
 #tfs_path <- "data/Drosophila_melanogaster_TF.txt"
 #cofacs_path <- "data/Drosophila_melanogaster_TF_cofactors.txt"
 #pirna_path <- "results/resources/pirna_pathway.tsv"

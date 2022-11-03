@@ -11,10 +11,11 @@ rule all:
     # resources
     "results/resources/gene_symbol_lookup.tsv.gz",
      "results/resources/pirna_pathway.tsv",
+     "results/resources/annotated_fixed_insertions.gr.rds",
+    "results/resources/filtered_models.tsv.gz",
     # important analysis results
     "results/analysis/deg/s2rplus.res.tsv.gz",
     "results/analysis/deg/ourKD.de.grs.rds",
-    "results/analysis/coexpression/filtered_models.tsv.gz",
     "results/analysis/signatures/s2rplus_te_gsea.pairs.tbl.rds",
     "results/analysis/signatures/gene_group_gsea.tbl.rds",
     "results/analysis/direct_binding/each_gene_te_kmer_dist.tbl.rds",
@@ -25,6 +26,7 @@ rule all:
     "results/analysis/direct_binding/by_community_te_kmer_dist.tbl.rds",
     "results/analysis/direct_binding/sequence_similarity_te_communities.tbl_graph.rds",
     "results/analysis/signatures/ourKD_gsea.tbl.rds",
+    'results/analysis/direct_binding/per_pair_nullranges.rds',
     # plots
     "results/plots/plot_oi_s2rplus_te_gsea.rds",
     "results/plots/plot_pirna_genes_in_lms.volc.rds",

@@ -8,13 +8,13 @@ library(circlize)
 #lkup_path <- "results/resources/gene_symbol_lookup.tsv.gz"
 lkup_path <- snakemake@input[["lkup"]]
 
-#merged_mods_path <- "results/analysis/coexpression/merged_models.tsv.gz"
+#merged_mods_path <- "results/resources/merged_models.tsv.gz"
 merged_mods_path <- snakemake@input[["merged_mods"]]
 
-#filtered_mods_path <- "results/analysis/coexpression/filtered_models.tsv.gz"
+#filtered_mods_path <- "results/resources/filtered_models.tsv.gz"
 filtered_mods_path <- snakemake@input[["filtered_mods"]]
 
-#extreme_mods_path <- "results/analysis/coexpression/extreme_models.tsv.gz"
+#extreme_mods_path <- "results/resources/extreme_models.tsv.gz"
 extreme_mods_path <- snakemake@input[["extreme_mods"]]
 
 lkup <- read_tsv(lkup_path)

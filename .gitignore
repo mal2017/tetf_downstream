@@ -3,3 +3,6 @@
 .Rproj*
 results/
 data/
+data2/
+.Rproj.user
+*pdf

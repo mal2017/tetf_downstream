@@ -12,14 +12,12 @@ library(rstatix)
 #lkup_path <- "results/resources/gene_symbol_lookup.tsv.gz"
 lkup_path <- snakemake@input[["lkup"]]
 
-#filtered_mods_path <- "results/analysis/coexpression/filtered_models.tsv.gz"
+#filtered_mods_path <- "results/resources/extreme_models.tsv.gz"
 filtered_mods_path <- snakemake@input[["filtered_mods"]]
 
-#merged_mods_path <- "results/analysis/coexpression/merged_models.tsv.gz"
+#merged_mods_path <- "results/resources/merged_models.tsv.gz"
 merged_mods_path <- snakemake@input[["merged_mods"]]
 
-#filtered_mods_path <- "results/analysis/coexpression/filtered_models.tsv.gz"
-filtered_mods_path <- snakemake@input[["filtered_mods"]]
 
 lkup <- read_tsv(lkup_path)
 
@@ -49,6 +47,7 @@ mats <- mats %>%
 tg <- mats %>%
   map(t) %>%
   map(as_tibble,rownames="teA") %>%
+  map(column_to_rownames,"teA") %>%
   map(cor_pmat) %>%
   #map(as.matrix) %>%
   map_df(as_tibble,rownames = "teA",.id="model") %>%

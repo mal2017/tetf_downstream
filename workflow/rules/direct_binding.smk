@@ -41,8 +41,9 @@ rule plot_each_gene_te_kmer_dist:
 rule coregulated_te_communities:
     input:
         lkup = rules.make_gene_symbol_lookup.output.tsv,
-        filtered_mods = rules.filter_models.output.filtered_tsv,
+        filtered_mods = rules.filter_models.output.extreme_tsv,
         merged_mods = rules.filter_models.output.merged_tsv,
+        tfs = "data/Drosophila_melanogaster_TF.txt",
     output:
         igraph = "results/analysis/direct_binding/coregulated_te_communities.igraph_list.rds",
         comms = "results/analysis/direct_binding/coregulated_te_communities.communities_tbl.rds",
@@ -79,7 +80,7 @@ rule sequence_similarity_communities:
 
 rule within_tf_nullranges:
     input:
-        lms = rules.filter_models.output.filtered_tsv,
+        lms = rules.filter_models.output.extreme_tsv,
         remap = "data/remap2022_nr_macs2_dm6_v1_0.bed.gz",
         het = "data/het_domains_r5todm6.bed.gz",
         s2_chromstate = "data/chromstate_s2_9state_r5todm6.bed.gz",
@@ -98,3 +99,13 @@ rule plot_within_tf_nullranges:
         rds = 'results/plots/plot_within_tf_grp_nullranges.rds'
     script:
         "../scripts/direct_binding/plot-within-tf-grp-nullranges.R"
+
+
+rule per_pair_nullranges:
+    input:
+        lms = rules.filter_models.output.extreme_tsv,
+        anno_ins = rules.annotate_fixed_insertions.output.rds
+    output:
+        rds = 'results/analysis/direct_binding/per_pair_nullranges.rds'
+    script:
+        "../scripts/direct_binding/per_pair_nullranges.R"

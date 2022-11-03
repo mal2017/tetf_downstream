@@ -1,7 +1,7 @@
 library(tidyverse)
 library(ggdensity)
 
-#mods_path <- "results/analysis/coexpression/filtered_models.tsv.gz"
+#mods_path <- "results/resources/extreme_models.tsv.gz"
 mods_path <- snakemake@input[["mods"]]
 
 mods <- read_tsv(mods_path)
@@ -18,13 +18,13 @@ te_df <- mods %>%
 
 
 g_tes <- ggplot(te_df,aes(pos,neg)) +
-  geom_hdr_points(probs=probs) +
+  geom_hdr_points(probs=probs,position = "jitter") +
   xlab("positively coexpressed genes") +
   ylab("negatively coexpressed genes") +
   ggtitle("TEs")
 
 g_genes <- ggplot(genes_df,aes(pos,neg)) +
-  geom_hdr_points(probs=probs) +
+  geom_hdr_points(probs=probs,position = "jitter") +
   xlab("positively coexpressed TEs") +
   ylab("negatively coexpressed TEs") +
   ggtitle("genes")

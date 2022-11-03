@@ -1,18 +1,3 @@
-rule filter_models:
-    """
-    merged: all models -> mean of replicates
-    filtered: merged -> all reps significant and no sign switches
-    extreme: filtered -> filter at some extreme quantile of abs(coefs) (see script for exact choice)
-    """
-    input:
-        expand("data/linear_models/{m}/{r}/lm.tidy.corrected.tsv.gz",m=["male_model_01","female_model_01"],r=[0,1,2])
-    output:
-        merged_tsv =  "results/analysis/coexpression/merged_models.tsv.gz",
-        filtered_tsv =  "results/analysis/coexpression/filtered_models.tsv.gz",
-        extreme_tsv =  "results/analysis/coexpression/extreme_models.tsv.gz"
-    script:
-        "../scripts/coexpression/consensus_lms.R"
-
 rule plot_intro_heatmap:
     input:
         lkup = rules.make_gene_symbol_lookup.output.tsv,
