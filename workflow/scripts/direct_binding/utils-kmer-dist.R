@@ -23,3 +23,9 @@ get_boot_dists2 <- function(n,exclude) {
     tibble(matched_boots = .) %>%
     mutate(matched.dist = map_dbl(matched_boots, get_dists))
 }
+
+get_boot_dists3 <- function(nTEs,n=1000) {
+  # te.names is in the global env
+  replicate(n,sample(te.names,size = nTEs, replace = F),simplify = F) %>%
+    map_dbl(get_dists)
+}

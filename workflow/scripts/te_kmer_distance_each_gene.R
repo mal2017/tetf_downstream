@@ -21,7 +21,7 @@ lms_path <- snakemake@input[["lms"]]
 # ---- get data ----------------------------------------------------------------
 tes.bin <- ape::read.FASTA(te_fasta_path)
 
-lms <- read_tsv(lms_path)
+lms <- read_tsv(lms_path) %>% filter(significant_x)
 #background_lms <- read_tsv(background_lms_path)
 
 # this would be too easy if we compared to non-expressed TEs - as these are super weird

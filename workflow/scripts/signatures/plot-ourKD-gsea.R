@@ -5,42 +5,39 @@ library(paletteer)
 
 FONTSIZE=7
 
-#lkup_path <- "results/resources/gene_symbol_lookup.tsv.gz"
-lkup_path <- snakemake@input[["lkup"]]
-
-# gsea_tbl_path <- "results/analysis/signatures/ourKD_gsea.tbl.rds"
+#gsea_tbl_path <- "results/analysis/signatures/ourKD_gsea.tbl.rds"
 gsea_tbl_path <- snakemake@input[["gsea_tbl"]]
 
-lkup <- read_tsv(lkup_path)
+gsea_tbl <- read_rds(gsea_tbl_path) 
 
-# https://www.gsea-msigdb.org/gsea/doc/GSEAUserGuideFrame.html#:~:text=Therefore%2C%20by%20default%2C%20GSEA%20ignores,with%2010%2C000%20to%2020%2C000%20features.
-# gsea ignores sizes < 15, awd is negcon
-gsea_tbl <- read_rds(gsea_tbl_path) %>% filter(comparison!="awd")
-
-gsea_tbl2 <- gsea_tbl %>% dplyr::select(kd,comparison,gsea.tidy) %>%
-  unnest(gsea.tidy) %>%
-  mutate(p.adjust = p.adjust(pvalue,method="BH")) %>%
+gsea_tbl2 <- gsea_tbl %>% 
   filter(kd == ID)
 
 gsea_gg_tbl <- gsea_tbl %>%
-  dplyr::select(kd,comparison,gsea) %>%
-  mutate(gsea.plt = map2(gsea,kd,
-                         ~gseaplot(.x,geneSetID = .y,title = paste("Perturbation: ",.y,"RNAi in S2R+\n","Signature: TEs coex. w/",.y," in DGRP lines"), 
+  mutate(tissue = str_extract(comparison,"head|male_gonad|female_gonad")) %>%
+  mutate(tissue = case_when(tissue == "male_gonad"~"testis",
+                            tissue == "female_gonad"~"ovary",
+                            T~tissue)) %>%
+  mutate(driver = str_extract(comparison,"tj|aTub|Mef2.R")) %>%
+  filter(p.adjust < 0.1) %>%
+  dplyr::select(comparison,tissue,driver,kd,p.adjust,NES,gsea) %>%
+  mutate(gsea.plt = pmap(list(gsea,kd,driver),
+                         function(gsea,kd,driver) gseaplot(gsea,geneSetID = kd,title = paste0("UAS::",driver," ",kd,"-RNAi;\nSignature: TEs coex. w/ ",kd," in DGRP lines"), 
                                    by="runningScore")))
-
-
 
 stat_res <- gsea_tbl2 %>%
   mutate(label = paste0("NES=",round(NES,2),"\npadj=",format.pval(p.adjust,3))) %>%
   dplyr::rename(RNAi="comparison")
 
 
-to_plot <- gsea_gg_tbl %>% dplyr::select(comparison,gsea.plt) %>% 
+to_plot <- gsea_gg_tbl %>% 
+  dplyr::select(comparison,gsea.plt) %>% 
   deframe() %>%
   map(`$`,data) %>%
   map_df(as_tibble,.id="RNAi") %>%
   arrange(RNAi,x) %>%
-  left_join(stat_res) %>%
+  left_join(dplyr::select(stat_res,-gsea,-Description,-data)) %>%
+  left_join(dplyr::select(gsea_gg_tbl,RNAi=comparison,tissue,driver)) %>%
   mutate(class = case_when(p.adjust < 0.1 & NES > 0~"pos",
                            p.adjust < 0.1 & NES < 0~"neg",
                            T~"n.s."))
@@ -51,28 +48,20 @@ to_plot <- to_plot %>%
          nes.scale.factor = NES/best.runningScore,
          runningScore.nes = runningScore*nes.scale.factor)
 
-
-#to_plot %>%group_by(RNAi) %>% slice_max(abs(runningScore)) %>% dplyr::relocate(nes.scale.factor,runningScore.nes,NES)
-
-#to_plot %>%
-#  group_by(RNAi) %>%
-#  slice_max(runningScore)
-
-tissue <- c(vvl="head",
-     NfI="head",
-     CG16779.ovary="ovary",
-     CG16779.head="head",
-     Unr="head",
-     ct="ovary",
-     mamo="ovary") %>%
-  enframe(name = "RNAi",value="tissue")
+# tissue <- c(vvl="head",
+#      NfI="head",
+#      CG16779.ovary="ovary",
+#      CG16779.head="head",
+#      Unr="head",
+#      ct="ovary",
+#      mamo="ovary") %>%
+#   enframe(name = "RNAi",value="tissue")
 
 
 gs <- to_plot %>%
-  left_join(tissue) %>%
-  mutate(label=paste0(kd,"(",tissue,")")) %>%
+  #left_join(tissue) %>%
+  mutate(label=paste0("UAS::",driver," ",kd,"-RNAi (",tissue,")")) %>%
   mutate(significance = ifelse(p.adjust < 0.1,"sig.","n.s.")) %>%
-  #filter(RNAi == "vvl") %>%
   ggplot(aes(x,runningScore.nes,color=label,linetype=significance)) +
   geom_path(size=rel(1.1)) +
   #scale_color_manual(values=c(pos="red",neg="blue",n.s.="gray")) +
@@ -85,13 +74,14 @@ gs <- to_plot %>%
   ylab("NES") +
   xlab("rank") +
   #scale_x_continuous(expand = expansion(0)) +
-  scale_color_paletteer_d("ggsci::default_ucscgb") +
+  #scale_color_paletteer_d("ggsci::default_ucscgb") +
   scale_linetype_manual(values = c("n.s."="dotted","sig."="solid"))
 
 
 o <- list(plot = gs, stats=stat_res)
 
 saveRDS(o,snakemake@output[["rds"]])
+ggsave(snakemake@output[["png"]],gs)
 
 
 

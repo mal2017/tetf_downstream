@@ -1,49 +1,68 @@
 configfile: "config/config.yaml"
 
 include: "rules/make_resources.smk"
-include: "rules/coexpression.smk"
+#include: "rules/coexpression.smk"
 include: "rules/differential_expression.smk"
 include: "rules/signatures.smk"
 include: "rules/direct_binding.smk"
+include: "rules/lm_descriptive_viz.smk"
+include: "rules/rewiring.smk"
 
 rule all:
   input:
+    rules.plot_n_models.output,
+    rules.plot_sig_coefs_alluvial.output,
+    rules.this_study_kd_deseq2.output,
+    rules.plot_ourKD_gsea.output,
+    rules.plot_this_study_kd_deseq2.output,
+    rules.plot_intro_heatmap.output,
+    rules.plot_binary_heatmap.output,
+    rules.plot_intro_ncoex_scatter.output,
+    rules.plot_male_vs_female_signal.output,
+    rules.plot_variance_explained_overview_boxplot.output,
+    rules.plot_candidate_rewiring_events_scatter.output,
+    rules.plot_gene_group_gsea.output,
+    rules.plot_each_gene_te_kmer_dist.output,
+    rules.plot_per_te_topgo_heatmaps.output,
+    rules.within_tf_regioner.output,
+
     # resources
-    "results/resources/gene_symbol_lookup.tsv.gz",
-     "results/resources/pirna_pathway.tsv",
-     "results/resources/annotated_fixed_insertions.gr.rds",
-    "results/resources/filtered_models.tsv.gz",
+    rules.make_pirna_gene_list.output,
+    rules.annotate_insertion_penetrance.output,
+    rules.annotate_fixed_insertions.output,
+
     # important analysis results
-    "results/analysis/deg/s2rplus.res.tsv.gz",
-    "results/analysis/deg/ourKD.de.grs.rds",
-    "results/analysis/signatures/s2rplus_te_gsea.pairs.tbl.rds",
-    "results/analysis/signatures/gene_group_gsea.tbl.rds",
-    "results/analysis/direct_binding/each_gene_te_kmer_dist.tbl.rds",
-    "results/analysis/direct_binding/coregulated_te_communities.communities_tbl.rds",
-    "results/analysis/coexpression/coex-clust.genes.hc-list.rds",
-    "results/analysis/coexpression/coex-clust.tes.hc-list.rds",
-    "results/analysis/direct_binding/coregulated_te_communities.tbl_with_graph_layouts.rds",
-    "results/analysis/direct_binding/by_community_te_kmer_dist.tbl.rds",
-    "results/analysis/direct_binding/sequence_similarity_te_communities.tbl_graph.rds",
-    "results/analysis/signatures/ourKD_gsea.tbl.rds",
-    'results/analysis/direct_binding/per_pair_nullranges.rds',
+    rules.get_candidate_rewiring_events.output,
+    rules.within_tf_nullranges.output,
+    # "results/analysis/deg/s2rplus.res.tsv.gz",
+
+    # "results/analysis/signatures/s2rplus_te_gsea.pairs.tbl.rds",
+    # "results/analysis/signatures/gene_group_gsea.tbl.rds",
+    # "results/analysis/direct_binding/each_gene_te_kmer_dist.tbl.rds",
+    # "results/analysis/direct_binding/coregulated_te_communities.communities_tbl.rds",
+    # "results/analysis/coexpression/coex-clust.genes.hc-list.rds",
+    # "results/analysis/coexpression/coex-clust.tes.hc-list.rds",
+    # "results/analysis/direct_binding/coregulated_te_communities.tbl_with_graph_layouts.rds",
+    # "results/analysis/direct_binding/by_community_te_kmer_dist.tbl.rds",
+    # "results/analysis/direct_binding/sequence_similarity_te_communities.tbl_graph.rds",
+    # "results/analysis/signatures/ourKD_gsea.tbl.rds",
+    # 'results/analysis/direct_binding/per_pair_nullranges.rds',
+    
     # plots
-    "results/plots/plot_oi_s2rplus_te_gsea.rds",
-    "results/plots/plot_pirna_genes_in_lms.volc.rds",
-    "results/plots/plot_pirna_genes_in_lms.easy_bar.rds",
-    "results/plots/plot_pirna_genes_in_lms.mean_coef_ecdf.rds",
-    "results/plots/plot_pirna_genes_in_lms.ntotal_ecdf.rds",
-    "results/plots/plot_gene_group_gsea.top10.rds",
-    "results/plots/plot_gene_group_gsea.random_walk.rds",
-    "results/plots/plot_coef_waterfall.rds",
-    "results/plots/plot_each_gene_te_kmer_dist.rds",
-    "results/plots/intro_heatmaps.gg-list.rds",
-    "results/plots/plot_intro_upsetplot.rds",
-    "results/plots/plot_intro_histograms.rds",
-    "results/plots/plot_intro_ncoex_scatter.rds",
-    "results/plots/plot_tfrnai_gsea.plot_list.rds",
-    'results/plots/plot_within_tf_grp_nullranges.rds',
-    "results/plots/plot_ourKD_gsea.plot_list.rds",
-    "results/plots/plot_this_study_kd_deseq2.gg_list.rds",
-    "results/plots/plot_tx_related_in_lms.rds"
+    # "results/plots/plot_oi_s2rplus_te_gsea.rds",
+    # "results/plots/plot_pirna_genes_in_lms.volc.rds",
+    # "results/plots/plot_pirna_genes_in_lms.easy_bar.rds",
+    # "results/plots/plot_pirna_genes_in_lms.mean_coef_ecdf.rds",
+    # "results/plots/plot_pirna_genes_in_lms.ntotal_ecdf.rds",
+    # "results/plots/plot_gene_group_gsea.top10.rds",
+    # "results/plots/plot_gene_group_gsea.random_walk.rds",
+    # "results/plots/plot_coef_waterfall.rds",
+    # "results/plots/plot_each_gene_te_kmer_dist.rds",
+    # "results/plots/plot_intro_upsetplot.rds",
+    # "results/plots/plot_intro_histograms.rds",
+    
+    # "results/plots/plot_tfrnai_gsea.plot_list.rds",
+    # 'results/plots/plot_within_tf_grp_nullranges.rds',
+    
+    # "results/plots/plot_tx_related_in_lms.rds"
 

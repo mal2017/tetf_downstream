@@ -1,1 +1,21 @@
-MASH_ARGS: '-k 11 -s 5000'
+GENOME_FA: resources/dmel-all-chromosome-r6.41.fasta.gz
+GTF: resources/dmel-all-r6.41.gtf.gz
+TFS: resources/Drosophila_melanogaster_TF.txt
+COFACS: resources/Drosophila_melanogaster_TF_cofactors.txt
+TE_FA: resources/Tidalbase_transposon_sequence.fasta
+
+MERGED_MODELS: upstream/final-models.collected-info.tsv.gz
+THIS_STUDY_RNAI: upstream/kd.se.gene.0.rds
+THIS_STUDY_DGRP_RNA: upstream/se.gene.0.rds
+DGRP_TIDAL: upstream/DGRP_flies.tsv.gz
+TE_CLASSES: resources/Tidalbase_Dmel_TE_classifications_2015.txt
+
+MASH_ARGS: '-k 11 -s 1000'
+EXPECTED_MASH_DIST_NPERM: 1000
+
+REWIRING_ANALYSIS:
+  TSS_DIST: 5000
+  MAX_TES_PER_GENE: 100 # effectively inf
+  COEF_QUANTILE_CUTOFF: 0.5 # effectively inf
+  MIN_PCT_FIXATION: 0.25
+  MAX_PCT_FIXATION: 0.75

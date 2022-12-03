@@ -1,31 +1,30 @@
 library(tidyverse)
 library(plyranges)
 library(nullranges)
-
 library(furrr)
 
-plan(multisession, workers = 4)
+threads <- ifelse(exists("snakemake"),snakemake@threads,4)
+plan(multisession, workers = threads)
 
-#lms_path <- "results/resources/filtered_models.tsv.gz"
-lms_path <- snakemake@input[["lms"]]
+lms <- ifelse(exists("snakemake"),snakemake@input[["lms"]],
+                   "upstream/final-models.collected-info.tsv.gz") %>%
+  read_tsv() %>%
+  filter(significant_x)
 
-lms <- read_tsv(lms_path)
+ins <- ifelse(exists("snakemake"),snakemake@input[["anno_ins"]],
+                   "results/resources/annotated_fixed_insertions.gr.rds") %>%
+  read_rds()
 
-#anno_ins_path <- "results/resources/annotated_fixed_insertions.gr.rds"
-anno_ins_path <- snakemake@input[["anno_ins"]]
-
-# 1. splitto get fixed insertions to other script
+# 1. get fixed insertions to other script
 # 2. For all TFs, and for all TEs
 # 3. need bootstraps for sure. = maybe frame as bootstrap score rather than trying to do wilcox afterwards
 
-tes2 <- read_rds(anno_ins_path)
+# add1 is just the first TF, so this is the first index in our slice
+tfs <- colnames(mcols(ins))[which(colnames(mcols(ins)) == "ADD1"):ncol(mcols(ins))]
 
-tfs <- colnames(mcols(tes2))[which(colnames(mcols(tes2)) == "ADD1"):ncol(mcols(tes2))]
+tes <- unique(ins$repeat_element)
 
-
-tes <- unique(tes2$repeat_element)
-
-
+# gets contingency table for two sets of ranges
 add_cont_tbl <-  function(mgr, TF) {
   if (is.null(mgr)) {
     return(NULL)
@@ -40,22 +39,34 @@ add_cont_tbl <-  function(mgr, TF) {
          dimnames = list(c("bound","unbound"),c("target","other")))
 }
 
-
-# for a single TF, single TE
-enrich_1te_1tf <- function(TF, TE, gr = tes2) {
+# gets matched nulls for a single TF, single TE
+enrich_1te_1tf <- function(TF, TE, gr = ins) {
   #message(paste(TF,TE))
   set.seed(2022)
   matched <- matchRanges(filter(gr,repeat_element==TE),
                          filter(gr,repeat_element!=TE),
-                         covar = ~ size + GC + s2_state, method = "s")
+                         covar = ~ size + nearest.tss, method = "s")
   
   return(add_cont_tbl(matched,TF))
 }
 
+sl <- seqlengths(ins)
+
+ins <- ins %>%
+  mutate(.,chr=as.character(seqnames(.))) %>%
+  mutate(.,dist.to.end = map2_dbl(chr,start,.f=~{
+    len <- sl[.x]
+    
+    min(.y,len-.y)
+  }))
+
 
 res <- expand_grid(TF = tfs,TE = tes) %>%
+  semi_join(lms, by=c(TF = "gene_symbol",TE="feature.y")) %>%
+  #filter(TF == "Hr39" & TE == "17.6") %>%
+  #filter(TF %in% c("pan")) %>%
   #head(2) %>% # for testing
-  mutate(cont_mat = future_map2(TF,TE,possibly(enrich_1te_1tf,otherwise = NULL),.progress = T))
+  mutate(cont_mat = future_map2(TF,TE,possibly(enrich_1te_1tf,otherwise = NULL),.progress = T,.options = furrr_options(seed = TRUE)))
 
 res <- lms %>%
   dplyr::select(TF = gene_symbol,TE=feature.y) %>%
@@ -66,10 +77,11 @@ res <- lms %>%
 
 res <- res %>% 
   filter(!map_lgl(cont_mat,is.null)) %>%
-  mutate(fish.test = map(cont_mat,~broom::tidy(fisher.test(.x)))) %>%
+  mutate(fish.test = map(cont_mat,~broom::tidy(fisher.test(.x,alternative = "greater")))) %>%
   unnest(fish.test,keep_empty = T) %>%
   bind_rows(filter(res,map_lgl(cont_mat,is.null))) %>%
-  ungroup()
+  ungroup() %>%
+  arrange(p.value)
 
 
 write_rds(res,snakemake@output[["rds"]])

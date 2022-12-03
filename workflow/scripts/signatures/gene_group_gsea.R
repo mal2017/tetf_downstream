@@ -24,7 +24,7 @@ tfs_path <- snakemake@input[["tfs"]]
 cofacs_path <- snakemake@input[["cofacs"]]
 pirna_path <- snakemake@input[["pirna"]]
 
-lms <- read_tsv(lms_path)
+lms <- read_tsv(lms_path) %>% filter(significant_x)
 
 tfs <- bind_rows(TF = read_tsv(tfs_path),
           cofactor = read_tsv(cofacs_path),
@@ -60,7 +60,7 @@ grps <- read_tsv("http://ftp.flybase.net/releases/FB2022_04/precomputed_files/ge
 # not filtering by extreme coefs
 to_plot <- lms %>% 
   group_by(feature.x) %>%
-  summarise(coef = mean(abs(mean_estimate.qnorm)),n_tes = dplyr::n(),.groups = "drop") %>%
+  summarise(coef = mean(estimate.qnorm),n_tes = dplyr::n(),.groups = "drop") %>%
   mutate(Tx.related = ifelse(feature.x %in% tfs$gene_id,"TF/coact.","other"))
 
 pathways <- list(Tx.related = unique(tfs %>% pull(gene_id)),piRNA=piRNAgenes$gene_ID) %>%
@@ -76,7 +76,7 @@ ranks <- to_plot %>%
   deframe
 
 set.seed(2022)
-gsea_res <- fgsea(pathways,ranks,scoreType="pos") %>% 
+gsea_res <- fgsea(pathways,ranks,scoreType="std") %>% 
   as_tibble() %>%
   arrange(pval)
 

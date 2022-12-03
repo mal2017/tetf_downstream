@@ -2,8 +2,9 @@ library(tidyverse)
 library(DESeq2)
 library(Biostrings)
 library(sva)
-#theme_set(theme_prism())
+library(plyranges)
 
+#se_path <- "upstream/kd.se.gene.0.rds"
 se_path <- snakemake@input[["se"]]
 gr_results_path <- snakemake@output[["grs"]]
 dds_results_path <- snakemake@output[["dds"]]
@@ -12,34 +13,25 @@ gene_universe <- read_tsv("http://ftp.flybase.net/releases/FB2022_04/precomputed
 
 allowed_genes <- gene_universe %>% filter(gene_type %in% c("protein_coding_gene"))
 
-probable_contaminants <- gene_universe %>% filter(gene_type %in% c("antisense_lncRNA_gene",
-                                                                   "pseudogene",
-                                                                   "lncRNA_gene",
-                                                                   "ncRNA_gene",
-                                                                   "tRNA_gene","rRNA_gene","mt_LSU_rRNA_gene",
-                                                                   "mt_LSU_rRNA_gene","RNase_MRP_RNA_gene","hpRNA_gene",
-                                                                   "H_ACA_box_snoRNA_gene","C_D_box_snoRNA_gene","sbRNA_gene"))
-
 lkup <- gene_universe %>% dplyr::select(gene_ID, gene_symbol) %>% distinct()
 
+se <- read_rds(se_path)
 
-se.all <- read_rds(se_path)
-
-colData(se.all) <- colData(se.all) %>% as_tibble(rownames = "name") %>%
-  mutate(batch=ifelse(str_detect(path_r1,"novo2"),"batch2","batch1")) %>%
-  mutate(knockdown2 = paste(knockdown,tissue,sep="_")) %>%
-  mutate(broad = if_else(str_detect(knockdown,'control'),"ctl","kd")) %>%
-  mutate(batch2 = paste(batch,tissue,sep="_")) %>%
+colData(se) <- colData(se) %>% 
+  as_tibble(rownames = "name") %>%
+  mutate(batch=case_when(str_detect(path_r1,"novo_")~"batch1",
+                         str_detect(path_r1,"novo2")~"batch2",
+                         str_detect(path_r1,"novo3")~"batch3")) %>%
+  mutate(knockdown2 = paste(knockdown,tissue,driver,sep="_")) %>%
+  mutate(driver_tissue = paste(driver,tissue,sep="_")) %>%
   column_to_rownames("name") %>%
   DataFrame()
 
-se.cont <- se.all[rownames(se.all) %in% probable_contaminants$gene_ID,]
-
-se <- se.all[rownames(se.all) %in% allowed_genes$gene_ID | !str_detect(rownames(se.all),"FBgn"),]
+se <- se [rownames(se) %in% allowed_genes$gene_ID | 
+               !str_detect(rownames(se),"FBgn"),]
 
 # ----------- count filtering --------------------------------------------------
 dds.pre <- DESeqDataSet(se,~ 1)
-
 
 dds.pre <- estimateSizeFactors(dds.pre,type="poscounts")
 
@@ -58,57 +50,120 @@ elementMetadata(se) <- elementMetadata(se) %>%
   DataFrame()
 
 # adjust for batch ---------- --------------------------------------------------
+assay(se) <- assay(se) %>% round()
+mat <-assay(se)
 
-# including knockdown here doesn't do a good job of removing the
-# batch effect.
-# I think this approach is more conservative, as some differences
-# between KDs and controls will not be retained, but
-# I'd rather be conservative and not discover a TE change
-# than make a false discovery
-mod.mat <- model.matrix( ~  tissue, data=colData(se))
+mode(mat) <- "integer"
 
-adjusted <- ComBat_seq(counts = assay(se), 
-                       batch = sapply(se$batch, switch, "batch1" = 1, "batch2" = 2, USE.NAMES = F),
-                       #group = sapply(se$tissue, switch, "female_head" = 1, "female_gonad" = 2, USE.NAMES = F),
-                       covar_mod = mod.mat,
-                       shrink = F, #full_mod = T,
-                       shrink.disp = T)
+adjusted <- ComBat_seq(counts = mat, 
+                       batch = se$batch,
+                       group = se$knockdown,
+                       covar_mod = model.matrix( ~ driver_tissue , data=colData(se)),
+                       shrink.disp = T,
+                       shrink = T,gene.subset.n = 500)
 
-se2 <- se
+mode(adjusted) <- "integer"
 
-assay(se2) <- adjusted
+se2 <- se; assay(se2) <- adjusted
 
+# differential expression on full set at once, raw and corrected----------------
 
-# differential expression ------------------------------------------------------
-
-ses <- list(raw = se,
-            corrected = se2)
+ses <- list(raw = se, adjusted = se2)
 
 run_deseq <- . %>%
-  DESeqDataSet(~ knockdown2) %>%
   estimateSizeFactors(type="poscounts") %>%
   DESeq()
 
-contrasts <- list(CG16779.head = c("knockdown2","CG16779_female_head","control_female_head"),
-                  Unr = c("knockdown2","Unr_female_head","control_female_head"),
-                  NfI = c("knockdown2","NFI_female_head","control_female_head"),
-                  vvl = c("knockdown2","vvl_female_head","control_female_head"),
-                  ct  = c("knockdown2","ct_female_gonad","control_female_gonad"),
-                  mamo = c("knockdown2","mamo_female_gonad","control_female_gonad"),
-                  awd = c("knockdown2","awd_female_gonad","control_female_gonad"),
-                  CG16779.ovary = c("knockdown2","CG16779_female_gonad","control_female_gonad"))
+contrasts <- list(CG16779.head = c("knockdown2","CG16779_female_head_Mef2.R","control_female_head_Mef2.R"),
+                  Unr = c("knockdown2","Unr_female_head_Mef2.R","control_female_head_Mef2.R"),
+                  NfI = c("knockdown2","NFI_female_head_Mef2.R","control_female_head_Mef2.R"),
+                  vvl = c("knockdown2","vvl_female_head_Mef2.R","control_female_head_Mef2.R"),
+                  ct  = c("knockdown2","ct_female_gonad_C587","control_female_gonad_C587"),
+                  mamo = c("knockdown2","mamo_female_gonad_C587","control_female_gonad_C587"),
+                  awd = c("knockdown2","awd_female_gonad_C587","control_female_gonad_C587"),
+                  CG16779.c587.ovary = c("knockdown2","CG16779_female_gonad_C587","control_female_gonad_C587"),
+                  pan.testis = c("knockdown2","pan_male_gonad_aTub","control_male_gonad_aTub"),
+                  pan.tj.ovary = c("knockdown2","pan_female_gonad_tj","control_female_gonad_tj"),
+                  CG16779.testis = c("knockdown2","CG16779_male_gonad_aTub","control_male_gonad_aTub"),
+                  CG16779.tj.ovary = c("knockdown2","CG16779_female_gonad_tj","control_female_gonad_tj"),
+                  pan.head = c("knockdown2","pan_female_head_Mef2.R","control_female_head_Mef2.R"))
+
+contrasts <- contrasts %>% set_names(.,map_chr(.,paste,collapse="_"))
 
 get_res <- function(dds) {
-  #map(~lfcShrink(dds,contrast = dds,type = "normal"))%>%
-  map(contrasts,~results(dds,contrast = .x,format = "GRanges")) %>%
-    map(~plyranges::mutate(.,feature = names(.)))
-  #map_df(as_tibble,rownames="feature",.id="comparison") %>%
-  #mutate(kd = str_extract(comparison,".+(?=\\.)|.+$"))
+  map(contrasts,~lfcShrink(dds,contrast = .x,format = "GRanges",type="normal")) %>%
+    map(~{mutate(.x,feature=names(.))})
 }
 
-dds_list <- map(ses,run_deseq) 
+dds_list <- map(ses,~DESeqDataSet(.,~knockdown2)) %>%
+  map(run_deseq)
 
-res_list <- map(dds_list,get_res)
+res_list <- map(dds_list,get_res) 
+
+# differential expression on split sets, no correction ----------------
+
+dds.testis <- DESeqDataSet(se[,se$tissue == "male_gonad"],~ knockdown2)
+dds.testis$knockdown2 <- relevel(dds.testis$knockdown2,ref="control_male_gonad_aTub")
+
+dds.ovary_c587 <- DESeqDataSet(se[,str_detect(se$tissue,"female_gonad") & se$driver == "C587"],~knockdown2)
+dds.ovary_c587$knockdown2 <- relevel(dds.ovary_c587$knockdown2, ref = "control_female_gonad_C587")
+
+dds.ovary_tj <- DESeqDataSet(se[,str_detect(se$tissue,"female_gonad") & se$driver == "tj"],~knockdown2)
+dds.ovary_tj$knockdown2 <- relevel(dds.ovary_tj$knockdown2, ref = "control_female_gonad_tj")
+
+dds.female_head <- DESeqDataSet(se[,str_detect(se$tissue,"female_head")],~knockdown2)
+dds.female_head$knockdown2 <- relevel(dds.female_head$knockdown2, ref = "control_female_head_Mef2.R")
+
+dds_list_indiv <- list(split.testis.raw=dds.testis,
+                 split.ovary.c587.raw=dds.ovary_c587,
+                 split.ovary.tj.raw=dds.ovary_tj,
+                 split.head.raw=dds.female_head)
+
+dds_list_indiv <- map(dds_list_indiv, run_deseq)
+
+res_list_indiv <- map(dds_list_indiv, ~{
+  ds <- .x
+  rn <- resultsNames(.x) %>% set_names(.,.) %>% .[2:length(.)] 
+  map(rn,~lfcShrink(ds,coef = .x,type="normal",format="GRanges")) %>%
+    map(~{mutate(.x,feature=names(.))})
+})
+
+#  combine all results ---------------------------------------------------------
+
+res_list <- c(res_list,res_list_indiv)
+dds_list <- c(dds_list,dds_list_indiv)
 
 saveRDS(res_list,gr_results_path)
 saveRDS(dds_list,dds_results_path)
+
+
+# ---------------------------------------------------
+
+# xx <- res_list %>% map(enframe) %>%
+#   bind_rows(.id="approach") %>%
+#   mutate(data = map(value,as_tibble)) %>%
+#   dplyr::select(-value) %>%
+#   unnest(data)
+# 
+# 
+# xx %>%
+#   filter(!str_detect(feature,"FBgn") & padj < 0.1) %>%
+#   filter(str_detect(name,"CG16779|NFI")) %>%
+#   #filter(str_detect(name,"pan")) %>%
+#   ggplot(aes(log2FoldChange,-log10(pvalue))) +
+#   geom_point() +
+#   facet_wrap(~approach + name,scales = "free_y")
+# 
+# 
+# xx %>%
+#   filter(!str_detect(name,"Intercept")) %>%
+#   unite(approach2,approach,name) %>%
+#   dplyr::select(approach2,feature,log2FoldChange) %>%
+#   dplyr::group_by(feature, approach2) %>%
+#   dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
+#   arrange(-n)
+#   pivot_wider(names_from = "approach2", values_from = "log2FoldChange")
+# 
+# filter(xx,is.na(feature))
+
+
