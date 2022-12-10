@@ -1,12 +1,13 @@
 configfile: "config/config.yaml"
 
 include: "rules/make_resources.smk"
-#include: "rules/coexpression.smk"
 include: "rules/differential_expression.smk"
 include: "rules/signatures.smk"
 include: "rules/direct_binding.smk"
 include: "rules/lm_descriptive_viz.smk"
+include: "rules/te_sequence_similarity.smk"
 include: "rules/rewiring.smk"
+include: "rules/motifs.smk"
 
 rule all:
   input:
@@ -24,17 +25,21 @@ rule all:
     rules.plot_gene_group_gsea.output,
     rules.plot_each_gene_te_kmer_dist.output,
     rules.plot_per_te_topgo_heatmaps.output,
-    rules.within_tf_regioner.output,
+    rules.plot_per_te_topgo_overview.output,
+    rules.plot_per_pair_nullranges.output,
+
+  
+    # important analysis results
+    rules.get_candidate_rewiring_events.output,
+    rules.per_pair_bootranges.output,
+    # "results/analysis/deg/s2rplus.res.tsv.gz",
 
     # resources
     rules.make_pirna_gene_list.output,
     rules.annotate_insertion_penetrance.output,
     rules.annotate_fixed_insertions.output,
-
-    # important analysis results
-    rules.get_candidate_rewiring_events.output,
-    rules.within_tf_nullranges.output,
-    # "results/analysis/deg/s2rplus.res.tsv.gz",
+    rules.ref_preproc.output,
+    rules.make_txdb.output,
 
     # "results/analysis/signatures/s2rplus_te_gsea.pairs.tbl.rds",
     # "results/analysis/signatures/gene_group_gsea.tbl.rds",
@@ -66,3 +71,13 @@ rule all:
     
     # "results/plots/plot_tx_related_in_lms.rds"
 
+
+rule figure1:
+  input:
+    cartoon=config.get("LM_CARTOON"),
+    heatmaps=rules.plot_intro_heatmap.output.rds,
+    ncoex_scatter=rules.plot_intro_ncoex_scatter.output.rds
+  output:
+    pdf = "results/main_figures/figure1.pdf"
+  script:
+    "scripts/figures/figure1.R"

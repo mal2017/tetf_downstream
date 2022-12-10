@@ -9,16 +9,13 @@ plan(multisession, workers = threads)
 # influenced by:
 # Influenced by (this tutorial)[https://bioconductor.org/packages/devel/workflows/vignettes/fluentGenomics/inst/doc/fluentGenomics.html]
 
-#background_lms_path <- "results/analysis/coexpression/filtered_models.tsv.gz"
-#lms_path <- "upstream/final-models.collected-info.tsv.gz"
-lms_path <- snakemake@input[["lms"]]
+# get lms from snakemake
+lms <- ifelse(exists("snakemake"),snakemake@input[["lms"]],"upstream/final-models.collected-info.tsv.gz") %>%
+  read_tsv() %>%
+  filter(significant_x)
 
-tfs_fl <- "resources/Drosophila_melanogaster_TF.txt"
-tfs_fl <- snakemake@input[["tfs"]]
-tfs <- read_tsv(tfs_fl)
-
-# ---- get data ----------------------------------------------------------------
-lms <- read_tsv(lms_path) %>% filter(significant_x) #%>% filter(feature.x %in% tfs$Ensembl)
+tfs <- ifelse(exists("snakemake"),snakemake@input[["tfs"]],"resources/Drosophila_melanogaster_TF.txt") %>%
+  read_tsv()
 
 # this would be too easy if we compared to non-expressed TEs - as these are super weird
 # so filter here to tonly consider TEs that make it into our coef set.
@@ -26,9 +23,9 @@ lms <- read_tsv(lms_path) %>% filter(significant_x) #%>% filter(feature.x %in% t
 te.names <- unique(lms$feature.y)
 
 # -------------------------- get dist ------------------------------------------
-#mash_dist_path <- "results/analysis/direct_binding/te_mash.txt"
-mash_dist_path <- snakemake@input[["mash_dist"]]
-mash_dist_tbl <- read_tsv(mash_dist_path,col_names = c("seqA","seqB","mash_dist","pval","shared_hashes"))
+mash_dist_tbl <- ifelse(exists("snakemake"),snakemake@input[["mash_dist"]],"results/analysis/direct_binding/te_mash.txt") %>%
+  read_tsv(col_names = c("seqA","seqB","mash_dist","pval","shared_hashes"))
+
 
 kmer.dist <- mash_dist_tbl %>%
   dplyr::select(seqA,seqB,mash_dist) %>%
@@ -37,8 +34,9 @@ kmer.dist <- mash_dist_tbl %>%
   as.dist()
 
 # --------------- bootstrapping ------------------------------------------------
-
-source("workflow/scripts/direct_binding/utils-kmer-dist.R")
+helper_code <- "workflow/scripts/te_sequence_similarity/utils-kmer-dist.R"
+stopifnot(file.exists(helper_code))
+source(helper_code)
 
 # random number consideration: https://www.r-bloggers.com/2020/09/future-1-19-1-making-sure-proper-random-numbers-are-produced-in-parallel-processing/
 set.seed(2022)

@@ -43,3 +43,25 @@ rule annotate_fixed_insertions:
         remap = "results/resources/remap.gr.rds",
     script:
         "../scripts/resource_making/annotate_fixed_insertions.R"
+
+rule ref_preproc:
+    """
+    make a enome fasta with stripped names
+    """
+    input:
+        genome_fa = config.get("GENOME_FA"),
+    output:
+        genome_fa = "results/resources/genome.fasta",
+    script:
+        "../scripts/resource_making/ref_preprocessing.R"
+
+rule make_txdb:
+    """
+    make a reloadable txdb a
+    """
+    input:
+        gtf = config.get("GTF"),
+    output:
+        txdb = "results/resources/txdb",
+    script:
+        "../scripts/resource_making/make_txdb.R"

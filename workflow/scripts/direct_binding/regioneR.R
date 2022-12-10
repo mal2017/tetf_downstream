@@ -44,7 +44,7 @@ res <- expand_grid(TE=names(ins),TF=names(remap)) %>%
   #head(5) %>%
   mutate(result = map2(TE,TF,.f=function(TE,TF) {
     set.seed(123)
-    z <- overlapPermTest(A= ins[[TE]], B =remap[[TF]],verbose=T,
+    z <- overlapPermTest(A= remap[[TF]], B =ins[[TE]],verbose=T,
                          genome=genome_df, 
                          alternative = "greater",
                          non.overlapping =T,

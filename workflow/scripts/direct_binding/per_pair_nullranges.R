@@ -11,9 +11,11 @@ lms <- ifelse(exists("snakemake"),snakemake@input[["lms"]],
   read_tsv() %>%
   filter(significant_x)
 
+
 ins <- ifelse(exists("snakemake"),snakemake@input[["anno_ins"]],
                    "results/resources/annotated_fixed_insertions.gr.rds") %>%
   read_rds()
+
 
 # 1. get fixed insertions to other script
 # 2. For all TFs, and for all TEs

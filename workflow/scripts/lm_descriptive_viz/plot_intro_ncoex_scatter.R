@@ -19,13 +19,15 @@ te_df <- mods %>%
   pivot_wider(names_from = relationship, values_from = n,values_fill = 0)
 
 g_tes <- ggplot(te_df,aes(pos,neg)) +
-  geom_hdr_points(probs=probs,position = "jitter") +
+  #geom_hdr_points(probs=probs) +
+  geom_point(size=rel(0.5))+
   xlab("positively coexpressed genes") +
   ylab("negatively coexpressed genes") +
   ggtitle("TEs")
 
 g_genes <- ggplot(genes_df,aes(pos,neg)) +
-  geom_hdr_points(probs=probs,position = "jitter") +
+  geom_point(size=rel(0.5))+
+  #geom_hdr_points(probs=probs) +
   xlab("positively coexpressed TEs") +
   ylab("negatively coexpressed TEs") +
   ggtitle("genes")

@@ -92,3 +92,12 @@ rule plot_per_te_topgo_heatmaps:
         pdf = "results/figs/plot_per_te_topgo_heatmaps.pdf"
     script:
         "../scripts/signatures/plot_per_te_topgo_heatmaps.R"
+
+rule plot_per_te_topgo_overview:
+    input:
+        tsv = rules.per_te_topgo.output.tsv,
+    output:
+        rds = "results/figs/per_te_topgo_overview.rds",
+        png = "results/figs/plot_per_te_topgo_overview.png"
+    script:
+        "../scripts/signatures/plot_per_te_topgo_overview.R"

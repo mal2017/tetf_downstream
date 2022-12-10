@@ -76,20 +76,23 @@ te_hcs <- mats %>% map(t) %>%
 
 col_fun = colorRamp2(colors = c("blue", "white", "red"),breaks = c(0.5*min(mats$combined),0,0.5*max(mats$combined)))
 
-plot_hm <- function(m, t,g,row_cap = "", col_cap = "") {
+plot_hm <- function(m, t,g,row_cap = "", col_cap = "",plot_leg=T) {
   row_cap <- paste0(row_cap," (n=",nrow(m),")")
   col_cap <- paste0(col_cap," (n=",ncol(m),")")
   xh <- Heatmap(m, border = "black",
+                show_heatmap_legend = plot_leg,
           cluster_rows = g, 
+          column_dend_height = unit(5,"mm"),
+          row_dend_width = unit(5,"mm"),
           na_col = "white",
-          row_title_gp = gpar(fontsize=12), 
-          column_title_gp = gpar(fontsize=12),
+          row_title_gp = gpar(fontsize=5), 
+          column_title_gp = gpar(fontsize=5),
           cluster_columns = t,
           row_title = row_cap,
           column_title = col_cap,heatmap_legend_param = list(grid_width=unit(2,"mm"),
                                                              grid_height = unit(2,"mm"), 
-                                                             labels_gp = gpar(fontsize = 12),
-                                                             title_gp = gpar(fontsize = 12, fontface = "bold")),
+                                                             labels_gp = gpar(fontsize = 5),
+                                                             title_gp = gpar(fontsize = 5, fontface = "bold")),
           col = col_fun,
           show_row_names = F,name = "score",
           use_raster = T,
@@ -99,14 +102,14 @@ plot_hm <- function(m, t,g,row_cap = "", col_cap = "") {
 
 hms <- list(combined = plot_hm(mats$combined, te_hcs$combined,gene_hcs$combined,row_cap = "genes", col_cap = "TEs"),
             male_model_01 = plot_hm(mats$male,  te_hcs$male, gene_hcs$male,row_cap = "genes", col_cap = "TEs"),
-            female_model_01 = plot_hm(mats$female, te_hcs$female, gene_hcs$female, row_cap = "genes", col_cap = "TEs"))
+            female_model_01 = plot_hm(mats$female, te_hcs$female, gene_hcs$female, row_cap = "genes", col_cap = "TEs",plot_leg = F))
 
 n_hits_and_extreme <- filtered_mods %>%
   #filter(coef.quantile > 0.9) %>%
   group_by(feature.x,feature.y,gene_symbol) %>%
   slice_max(coef.quantile,n = 1, with_ties = F) %>%
   group_by(feature.x, gene_symbol) %>%
-  dplyr::summarise(n=n(),nExtreme = sum(coef.quantile > 0.999),.groups = "drop") %>%
+  dplyr::summarise(n=n(),nExtreme = sum(coef.quantile > 0.99),.groups = "drop") %>%
   column_to_rownames("feature.x") %>%
   .[rownames(filtered_mats$combined),]
 
@@ -116,22 +119,22 @@ hms$combined <- hms$combined +
   #Heatmap(n_hits_and_extreme$nExtreme, name="N extreme", width=unit(5,"mm")) +
   rowAnnotation(link = anno_mark(at = which(n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme)), 
                                  labels = n_hits_and_extreme[n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme),"gene_symbol"], 
-                                 link_width = unit(20,"mm"),
-                                 labels_gp = gpar(fontsize = 12), padding = unit(1, "mm")))
+                                 link_width = unit(1,"mm"),
+                                 labels_gp = gpar(fontsize = 5), padding = unit(1, "mm")))
 
 hms$male_model_01<- hms$male_model_01 +
   #Heatmap(n_hits_and_extreme$nExtreme, name="N extreme", width=unit(5,"mm")) +
   rowAnnotation(link = anno_mark(at = which(n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme)), 
                                  labels = n_hits_and_extreme[n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme),"gene_symbol"], 
-                                 link_width = unit(20,"mm"),
-                                 labels_gp = gpar(fontsize = 12), padding = unit(1, "mm")))
+                                 link_width = unit(2,"mm"),
+                                 labels_gp = gpar(fontsize = 5), padding = unit(1, "mm")))
 
 hms$female_model_01 <- hms$female_model_01 +
   #Heatmap(n_hits_and_extreme$nExtreme, name="N extreme", width=unit(5,"mm")) +
   rowAnnotation(link = anno_mark(at = which(n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme)), 
                                  labels = n_hits_and_extreme[n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme),"gene_symbol"], 
-                                 link_width = unit(20,"mm"),
-                                 labels_gp = gpar(fontsize = 12), padding = unit(1, "mm")))
+                                 link_width = unit(2,"mm"),
+                                 labels_gp = gpar(fontsize = 5), padding = unit(1, "mm")))
 
 
 
