@@ -27,7 +27,8 @@ rule all:
     rules.plot_per_te_topgo_heatmaps.output,
     rules.plot_per_te_topgo_overview.output,
     rules.plot_per_pair_nullranges.output,
-
+    rules.plot_remap_peak_sea.output,
+    rules.plot_per_pair_bootranges.output,
   
     # important analysis results
     rules.get_candidate_rewiring_events.output,

@@ -40,6 +40,7 @@ rule per_pair_bootranges:
         remap = rules.annotate_fixed_insertions.output.remap,
     output:
         rds = "results/analysis/direct_binding/per_pair_bootranges.rds",
+        boots = "results/analysis/direct_binding/per_pair_bootranges.boots.rds",
         seg_rds = "results/analysis/direct_binding/per_pair_bootranges.seg.rds",
     params:
         R = config.get("BOOTRANGES_REPS"),
@@ -52,3 +53,13 @@ rule per_pair_bootranges:
         "../scripts/direct_binding/per_pair_bootranges.R"
 
 
+rule plot_per_pair_bootranges:
+    input:
+        rds = rules.per_pair_bootranges.output.rds,
+        boots = rules.per_pair_bootranges.output.boots,
+        seg_rds = rules.per_pair_bootranges.output.seg_rds,
+    output:
+        rds = 'results/plots/per_pair_bootranges.rds',
+        png = 'results/plots/per_pair_bootranges.png'
+    script:
+        "../scripts/direct_binding/plot_per_pair_bootranges.R"

@@ -78,22 +78,23 @@ possibly_bootranges <- possibly(function(...) {
 },otherwise = NULL)
 
 # get TE/TF pairs to check
-res <- lms %>%
+res0 <- lms %>%
   filter(gene_symbol %in% names(chip)) %>%
   #filter(gene_symbol == "pan") %>%
   dplyr::select(TF=gene_symbol,TE=feature.y) %>%
   distinct() #%>% head(1)
 
-pb <- progress_estimated(length(unique(res$TE)))
+pb <- progress_estimated(length(unique(res0$TE)))
 
 # get bootstraps for each TE
-res <- res %>%
+boot_df <- res0 %>%
   dplyr::select(TE) %>%
   distinct() %>%
   #head(1) %>%
   mutate(ins.gr = map(TE,~{ins[ins$repeat_element == .x,c("repeat_element","iter")]})) %>%
-  mutate(boot.gr = map(ins.gr, possibly_bootranges, blockLength, seg=seg_cbs, R=R,withinChrom=F)) %>%
-  left_join(res,., by="TE") %>%
+  mutate(boot.gr = map(ins.gr, possibly_bootranges, blockLength, seg=seg_cbs, R=R,withinChrom=F))
+
+res <- left_join(res0,boot_df, by="TE") %>%
   drop_na()
 
 # i previously added an 'iter' field to the granges of interest
@@ -122,8 +123,10 @@ res <- res %>% mutate(observed = map2_int(ins.gr,TF,~{pb$tick();possibly_get_sta
 
 
 # number of expected values that are greater than or equal to the observed
-res <- res %>%
-  mutate(p = map2_dbl(observed,expected,~{sum(.y>=.x)/length(.y)}))
+res.final <- res %>%
+  mutate(p = map2_dbl(observed,expected,~{sum(.y>=.x)/length(.y)})) %>%
+  dplyr::select(-ins.gr,-boot.gr)
 
-write_rds(res,snakemake@output[["rds"]])
+write_rds(res.final,snakemake@output[["rds"]])
+write_rds(boot_df,snakemake@output[["boots"]])
 write_rds(seg_cbs,snakemake@output[["seg_rds"]])
