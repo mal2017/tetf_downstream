@@ -35,15 +35,14 @@ rule gene_group_gsea:
     script:
         "../scripts/signatures/gene_group_gsea.R"
 
-rule plot_gene_group_gsea:
+rule plot_gene_group_gsea_volc:
     input:
         gene_group_gsea = rules.gene_group_gsea.output.rds
     output:
-        top10 = "results/figs/gene_group_gsea.top10.rds",
-        random_walk = "results/figs/gene_group_gsea.random_walk.rds",
-        png = "results/figs/gene_group_gsea.random_walk.png",
+        png = "results/figs/gene_group_gsea.volc.png",
+        rds = "results/figs/gene_group_gsea.volc.rds",
     script:
-        "../scripts/signatures/plot_gene_group_gsea.R"
+        "../scripts/signatures/plot_gene_group_gsea_volc.R"
 
 
 # rule plot_tfrnai_gsea:

@@ -47,6 +47,8 @@ rule per_pair_bootranges:
         blockLength = config.get("BOOTRANGES_BLOCKLENGTH"),
         L_s = config.get("BOOTRANGES_SEGLENGTH"), 
         nseg = config.get("BOOTRANGES_NSEG"),
+    priority:
+        100
     threads:
         8
     script:

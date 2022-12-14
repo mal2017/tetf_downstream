@@ -4,16 +4,25 @@ library(Biostrings)
 library(BSgenome)
 library(GenomicRanges)
 
+# import bed file of repeatmasker features with rtracklayer
+rpm <- ifelse(exists("snakemake"),snakemake@input[["rpm"]],
+              "resources/plus-repeats.repeatmasked.fixednames.bed") %>%
+  import()
+
+strand(rpm) <- "*"
+
 # import bed file of remap peaks with rtracklayer
 grl <- ifelse(exists("snakemake"),snakemake@input[["bed"]],
               "results/resources/remap.gr.rds") %>%
     read_rds()
 
 # keep only seqames 2R, 2L, 3R, 3L, X, Y, for each gr in the grl
+# keep only peaks not on masked repeats
 # and drop unused seqlevels
 grl <- grl %>% 
     as.list() %>%
     map(~plyranges::filter(.x,seqnames %in% c("2R","2L","3R","3L","X","Y"))) %>%
+    map(~plyranges::filter_by_non_overlaps(.x, rpm)) %>%
     GRangesList()
 
 seqlevels(grl) <- seqlevelsInUse(grl)

@@ -19,8 +19,7 @@ lms <- lms %>%
     summarise(n = n()) %>%
     arrange(desc(n)) %>%
     left_join(lms,.) %>%
-    filter(n>5)
-
+    filter(n>2)
 
 
 fa <- ifelse(exists("snakemake"),snakemake@input[["tes"]],

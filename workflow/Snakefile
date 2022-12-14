@@ -8,6 +8,7 @@ include: "rules/lm_descriptive_viz.smk"
 include: "rules/te_sequence_similarity.smk"
 include: "rules/rewiring.smk"
 include: "rules/motifs.smk"
+include: "rules/specific_genes.smk"
 
 rule all:
   input:
@@ -22,13 +23,15 @@ rule all:
     rules.plot_male_vs_female_signal.output,
     rules.plot_variance_explained_overview_boxplot.output,
     rules.plot_candidate_rewiring_events_scatter.output,
-    rules.plot_gene_group_gsea.output,
+    rules.plot_gene_group_gsea_volc.output,
     rules.plot_each_gene_te_kmer_dist.output,
     rules.plot_per_te_topgo_heatmaps.output,
     rules.plot_per_te_topgo_overview.output,
     rules.plot_per_pair_nullranges.output,
     rules.plot_remap_peak_sea.output,
     rules.plot_per_pair_bootranges.output,
+    rules.plot_pirna_genes_in_lms.output,
+    rules.compare_hmg_motifs_from_archbold14.output,
   
     # important analysis results
     rules.get_candidate_rewiring_events.output,
@@ -42,36 +45,6 @@ rule all:
     rules.ref_preproc.output,
     rules.make_txdb.output,
 
-    # "results/analysis/signatures/s2rplus_te_gsea.pairs.tbl.rds",
-    # "results/analysis/signatures/gene_group_gsea.tbl.rds",
-    # "results/analysis/direct_binding/each_gene_te_kmer_dist.tbl.rds",
-    # "results/analysis/direct_binding/coregulated_te_communities.communities_tbl.rds",
-    # "results/analysis/coexpression/coex-clust.genes.hc-list.rds",
-    # "results/analysis/coexpression/coex-clust.tes.hc-list.rds",
-    # "results/analysis/direct_binding/coregulated_te_communities.tbl_with_graph_layouts.rds",
-    # "results/analysis/direct_binding/by_community_te_kmer_dist.tbl.rds",
-    # "results/analysis/direct_binding/sequence_similarity_te_communities.tbl_graph.rds",
-    # "results/analysis/signatures/ourKD_gsea.tbl.rds",
-    # 'results/analysis/direct_binding/per_pair_nullranges.rds',
-    
-    # plots
-    # "results/plots/plot_oi_s2rplus_te_gsea.rds",
-    # "results/plots/plot_pirna_genes_in_lms.volc.rds",
-    # "results/plots/plot_pirna_genes_in_lms.easy_bar.rds",
-    # "results/plots/plot_pirna_genes_in_lms.mean_coef_ecdf.rds",
-    # "results/plots/plot_pirna_genes_in_lms.ntotal_ecdf.rds",
-    # "results/plots/plot_gene_group_gsea.top10.rds",
-    # "results/plots/plot_gene_group_gsea.random_walk.rds",
-    # "results/plots/plot_coef_waterfall.rds",
-    # "results/plots/plot_each_gene_te_kmer_dist.rds",
-    # "results/plots/plot_intro_upsetplot.rds",
-    # "results/plots/plot_intro_histograms.rds",
-    
-    # "results/plots/plot_tfrnai_gsea.plot_list.rds",
-    # 'results/plots/plot_within_tf_grp_nullranges.rds',
-    
-    # "results/plots/plot_tx_related_in_lms.rds"
-
 
 rule figure1:
   input:
@@ -82,3 +55,12 @@ rule figure1:
     pdf = "results/main_figures/figure1.pdf"
   script:
     "scripts/figures/figure1.R"
+
+rule figure2:
+  input:
+    pirna_box = rules.plot_pirna_genes_in_lms.output.rds,
+    gg_gsea_volc = rules.plot_gene_group_gsea_volc.output.rds,
+  output:
+    pdf = "results/main_figures/figure2.pdf"
+  script:
+    "scripts/figures/figure2.R"

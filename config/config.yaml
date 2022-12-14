@@ -9,11 +9,15 @@ THIS_STUDY_RNAI: upstream/kd.se.gene.0.rds
 THIS_STUDY_DGRP_RNA: upstream/se.gene.0.rds
 DGRP_TIDAL: upstream/DGRP_flies.tsv.gz
 TE_CLASSES: resources/Tidalbase_Dmel_TE_classifications_2015.txt
+REPEATMASKER_BED: resources/plus-repeats.repeatmasked.fixednames.bed
+
+BBMASK_ENTROPY: 0.7
+BBMASK_W: 12
 
 MASH_ARGS: '-k 11 -s 1000'
 EXPECTED_MASH_DIST_NPERM: 1000
 
-BOOTRANGES_REPS: 100
+BOOTRANGES_REPS: 1000
 BOOTRANGES_SEGLENGTH: 1e5
 BOOTRANGES_BLOCKLENGTH: 5e5
 BOOTRANGES_NSEG: 3
