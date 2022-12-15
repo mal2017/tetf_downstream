@@ -22,8 +22,8 @@ rule plot_candidate_rewiring_events_scatter:
     input:
         rds = rules.get_candidate_rewiring_events.output.rds
     output:
-        rds="results/figs/candidate_rewiring_events_scatter.rds",
-        png="results/figs/candidate_rewiring_events_scatter.png"
+        rds="results/plots/candidate_rewiring_events_scatter.rds",
+        png="results/plots/candidate_rewiring_events_scatter.png"
     script:
         "../scripts/rewiring/plot_candidate_rewiring_events_scatter.R"
 

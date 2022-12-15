@@ -38,7 +38,7 @@ rule plot_each_gene_te_kmer_dist:
         tfs = config.get("TFS"),
         cofacs = config.get("COFACS"),
     output:
-        rds = "results/figs/each_gene_te_kmer_dist.list.rds",
-        pdf =  "results/figs/each_gene_te_kmer_dist.pdf",
+        rds = "results/plots/each_gene_te_kmer_dist.list.rds",
+        pdf =  "results/plots/each_gene_te_kmer_dist.pdf",
     script:
         "../scripts/te_sequence_similarity/plot_intra_gene_te_kmer_distance.R"

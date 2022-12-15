@@ -1,29 +1,3 @@
-# rule s2rplus_coex_te_gsea:
-#     """
-#     All is a tibble with rowns containing nested tbls and/or orther S4 objects.
-#     pairs is a flat tibble that includes all matches in which the tested signature==KD.
-#     """
-#     input:
-#         deg = rules.s2rplus_limma.output.tsv,
-#         coex = rules.filter_models.output.filtered_tsv,
-#     output:
-#         all = "results/analysis/signatures/s2rplus_te_gsea.all.tbl.rds",
-#         pairs = "results/analysis/signatures/s2rplus_te_gsea.pairs.tbl.rds",
-#     threads:
-#         6
-#     script:
-#         "../scripts/signatures/tfrnai_gsea.R"
-
-# rule plot_oi_s2rplus_te_gsea:
-#     input:
-#         all = rules.s2rplus_coex_te_gsea.output.all,
-#         pairs = rules.s2rplus_coex_te_gsea.output.pairs,
-#     output:
-#         o = "results/plots/plot_oi_s2rplus_te_gsea.rds"
-#     script:
-#         "../scripts/signatures/plot-oi-s2rplus-gsea.R"
-
-
 rule gene_group_gsea:
     input:
         lms = config.get("MERGED_MODELS"),
@@ -39,22 +13,10 @@ rule plot_gene_group_gsea_volc:
     input:
         gene_group_gsea = rules.gene_group_gsea.output.rds
     output:
-        png = "results/figs/gene_group_gsea.volc.png",
-        rds = "results/figs/gene_group_gsea.volc.rds",
+        png = "results/plots/gene_group_gsea.volc.png",
+        rds = "results/plots/gene_group_gsea.volc.rds",
     script:
         "../scripts/signatures/plot_gene_group_gsea_volc.R"
-
-
-# rule plot_tfrnai_gsea:
-#     input:
-#         limma = rules.s2rplus_limma.output.tsv,
-#         lkup = rules.make_gene_symbol_lookup.output.tsv,
-#         filtered_mods = rules.filter_models.output.filtered_tsv,
-#         gsea_pairs = rules.s2rplus_coex_te_gsea.output.pairs,
-#     output:
-#         rds = "results/plots/plot_tfrnai_gsea.plot_list.rds"
-#     script:
-#         "../scripts/signatures/plot-tfrnai-gsea.R"
 
 rule ourKD_gsea:
     input:
@@ -70,8 +32,8 @@ rule plot_ourKD_gsea:
     input:
         gsea_tbl = rules.ourKD_gsea.output.rds,
     output:
-        rds = "results/figs/ourKD_gsea.rds",
-        png = "results/figs/ourKD_gsea.png"
+        rds = "results/plots/ourKD_gsea.rds",
+        png = "results/plots/ourKD_gsea.png"
     script:
         "../scripts/signatures/plot-ourKD-gsea.R"
 
@@ -87,8 +49,8 @@ rule plot_per_te_topgo_heatmaps:
     input:
         tsv = rules.per_te_topgo.output.tsv,
     output:
-        rds = "results/figs/per_te_topgo_heatmaps.rds",
-        pdf = "results/figs/plot_per_te_topgo_heatmaps.pdf"
+        rds = "results/plots/per_te_topgo_heatmaps.rds",
+        pdf = "results/plots/plot_per_te_topgo_heatmaps.pdf"
     script:
         "../scripts/signatures/plot_per_te_topgo_heatmaps.R"
 
@@ -96,7 +58,55 @@ rule plot_per_te_topgo_overview:
     input:
         tsv = rules.per_te_topgo.output.tsv,
     output:
-        rds = "results/figs/per_te_topgo_overview.rds",
-        png = "results/figs/plot_per_te_topgo_overview.png"
+        rds = "results/plots/per_te_topgo_overview.rds",
+        png = "results/plots/plot_per_te_topgo_overview.png"
     script:
         "../scripts/signatures/plot_per_te_topgo_overview.R"
+
+
+
+rule s2rplus_coex_te_gsea_by_de:
+    """
+    All is a tibble with rowns containing nested tbls and/or orther S4 objects.
+    pairs is a flat tibble that includes all matches in which the tested signature==KD.
+    """
+    input:
+        deg = rules.s2rplus_limma.output.tsv,
+        coex = config.get("MERGED_MODELS")
+    output:
+        all = "results/analysis/signatures/s2rplus_te_gsea.all.tbl.rds",
+        pairs = "results/analysis/signatures/s2rplus_te_gsea.pairs.tbl.rds",
+    script:
+        "../scripts/signatures/tfrnai_gsea_de.R"
+
+rule plot_tfrnai_gsea:
+    """
+    Overview of all GSEA results comparing predicted TE signatures to KDs.
+    """
+    input:
+        limma = rules.s2rplus_limma.output.tsv,
+        lkup = rules.make_gene_symbol_lookup.output.tsv,
+        mods = config.get("MERGED_MODELS"),
+        gsea_pairs = rules.s2rplus_coex_te_gsea_by_de.output.pairs,
+    output:
+        rds = "results/plots/plot_tfrnai_gsea.plot_list.rds",
+        png_bar = "results/plots/plot_tfrnai_gsea.bar.png",
+        png_volc = "results/plots/plot_tfrnai_gsea.volc.png",
+    script:
+        "../scripts/signatures/plot-tfrnai-gsea.R"
+
+
+rule plot_oi_s2rplus_te_gsea:
+    """
+    Random walk plots of significant GSEA results.
+    """
+    input:
+        all = rules.s2rplus_coex_te_gsea_by_de.output.all,
+        pairs = rules.s2rplus_coex_te_gsea_by_de.output.pairs,
+    output:
+        rds = "results/plots/plot_oi_s2rplus_te_gsea.rds",
+        png  = "results/plots/plot_oi_s2rplus_te_gsea.png",
+    script:
+        "../scripts/signatures/plot-oi-s2rplus-gsea.R"
+
+

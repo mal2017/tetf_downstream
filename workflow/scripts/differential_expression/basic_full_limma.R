@@ -2,13 +2,19 @@ library(edgeR)
 library(tidyverse)
 library(SummarizedExperiment)
 
-#se_path <- "data/tfrnai.se.gene.0.rds"
+mods <- ifelse(exists("snakemake"),
+               snakemake@input[["mods"]],
+               "upstream/final-models.collected-info.tsv.gz") %>%
+  read_tsv() %>%
+  filter(significant_x)
+
+#se_path <- "upstream/tfrnai.se.gene.0.rds"
 se_path <- snakemake@input[["se"]]
 
-#runselector_path <- "data/full_tfrnai_srarunselector.txt"
+#runselector_path <- "resources/full_tfrnai_srarunselector.txt"
 runselector_path <- snakemake@input[["runselect"]]
 
-#batch_path <- "data/batch_data.tsv.gz"
+#batch_path <- "resources/batch_data.tsv.gz"
 batch_path <- snakemake@input[["batch"]]
 tsv_results_path <- snakemake@output[["tsv"]]
 
@@ -62,6 +68,9 @@ se <- se[rownames(se) %in% allowed_genes$gene_ID | !str_detect(rownames(se),"FBg
 
 # REMOVE PER MDS PLOT
 se <- se[,colnames(se)!="LacZ_SRR3488228"]
+
+# we're interested in the knockdowns for TE correlated genes
+se <- se[,se$rnai %in% mods$gene_symbol]
 
 d0 <- DGEList(assay(se))
 

@@ -32,6 +32,8 @@ rule all:
     rules.plot_per_pair_bootranges.output,
     rules.plot_pirna_genes_in_lms.output,
     rules.compare_hmg_motifs_from_archbold14.output,
+    rules.plot_tfrnai_gsea.output,
+    rules.plot_oi_s2rplus_te_gsea.output,
   
     # important analysis results
     rules.get_candidate_rewiring_events.output,
@@ -52,7 +54,7 @@ rule figure1:
     heatmaps=rules.plot_intro_heatmap.output.rds,
     ncoex_scatter=rules.plot_intro_ncoex_scatter.output.rds
   output:
-    pdf = "results/main_figures/figure1.pdf"
+    pdf = "results/figures/figure1.pdf"
   script:
     "scripts/figures/figure1.R"
 
@@ -61,6 +63,22 @@ rule figure2:
     pirna_box = rules.plot_pirna_genes_in_lms.output.rds,
     gg_gsea_volc = rules.plot_gene_group_gsea_volc.output.rds,
   output:
-    pdf = "results/main_figures/figure2.pdf"
+    pdf = "results/figures/figure2.pdf"
   script:
     "scripts/figures/figure2.R"
+
+rule figure3:
+  input:
+    our_kds = rules.plot_ourKD_gsea.output.rds,
+    s2rnai = rules.plot_tfrnai_gsea.output.rds,
+  output:
+    pdf = "results/figures/figure3.pdf"
+  script:
+    "scripts/figures/figure3.R"
+
+rule figure4:
+  input:
+  output:
+    pdf = "results/figures/figure4.pdf"
+  script:
+    "scripts/figures/figure4.R"

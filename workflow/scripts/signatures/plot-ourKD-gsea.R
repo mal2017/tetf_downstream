@@ -62,21 +62,17 @@ gs <- to_plot %>%
   #left_join(tissue) %>%
   mutate(label=paste0("UAS::",driver," ",kd,"-RNAi (",tissue,")")) %>%
   mutate(significance = ifelse(p.adjust < 0.1,"sig.","n.s.")) %>%
-  ggplot(aes(x,runningScore.nes,color=label,linetype=significance)) +
+  ggplot(aes(x,runningScore.nes,color=label)) +
   geom_path(size=rel(1.1)) +
-  #scale_color_manual(values=c(pos="red",neg="blue",n.s.="gray")) +
-  #facet_wrap(~RNAi, ncol=1,scales="free") +
   geom_hline(yintercept = 0, linetype="dashed") +
   #ggrepel::geom_text_repel(max.overlaps = 10, max.iter = 100,color="black",fontface="italic",force_pull = 0.1,
   #                         data=. %>% 
   #                           filter(p.adjust < 0.1) %>% group_by(RNAi) %>% slice_max(abs(runningScore),n = 1, with_ties = F),
   #                         aes(label=str_wrap(RNAi,10)),vjust="bottom",hjust="left",size=unit(FONTSIZE-2,"pt")) + 
   ylab("NES") +
-  xlab("rank") +
+  xlab("rank") 
   #scale_x_continuous(expand = expansion(0)) +
-  #scale_color_paletteer_d("ggsci::default_ucscgb") +
-  scale_linetype_manual(values = c("n.s."="dotted","sig."="solid"))
-
+  #scale_color_paletteer_d("ggsci::default_ucscgb")
 
 o <- list(plot = gs, stats=stat_res)
 

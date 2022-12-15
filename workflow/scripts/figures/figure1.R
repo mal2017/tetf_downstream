@@ -9,10 +9,10 @@ theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = eleme
 cartoon_01 <- ifelse(exists("snakemake"),snakemake@input[["cartoon"]],"resources//simple_linmod_methods_v01.png") %>%
   readPNG(native = T)
 
-intro_heats <- ifelse(exists("snakemake"),snakemake@input[["heatmaps"]],"results/figs/intro_heatmaps.gg-list.rds") %>%
+intro_heats <- ifelse(exists("snakemake"),snakemake@input[["heatmaps"]],"results/plots/intro_heatmaps.gg-list.rds") %>%
   read_rds()
 
-intro_scatter <- ifelse(exists("snakemake"),snakemake@input[["ncoex_scatter"]],"results/figs/intro_ncoex_scatter.rds") %>%
+intro_scatter <- ifelse(exists("snakemake"),snakemake@input[["ncoex_scatter"]],"results/plots/intro_ncoex_scatter.rds") %>%
   read_rds()
 
 

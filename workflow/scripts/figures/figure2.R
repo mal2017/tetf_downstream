@@ -4,10 +4,10 @@ library(patchwork)
 
 theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = element_text(hjust = 0.5)))
 
-pirna_box <- ifelse(exists("snakemake"),snakemake@input[["pirna_box"]],"results/figs/pirna_genes_in_lms.rds") %>%
+pirna_box <- ifelse(exists("snakemake"),snakemake@input[["pirna_box"]],"results/plots/pirna_genes_in_lms.rds") %>%
   read_rds()
 
-tf_gsea <- ifelse(exists("snakemake"),snakemake@input[["gg_gsea_volc"]],"results/figs/gene_group_gsea.volc.rds") %>%
+tf_gsea <- ifelse(exists("snakemake"),snakemake@input[["gg_gsea_volc"]],"results/plots/gene_group_gsea.volc.rds") %>%
   read_rds()
 
 pirna_box <- pirna_box & scale_fill_grey(start = 0, end = 0.9)

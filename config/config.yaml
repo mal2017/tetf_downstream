@@ -11,6 +11,10 @@ DGRP_TIDAL: upstream/DGRP_flies.tsv.gz
 TE_CLASSES: resources/Tidalbase_Dmel_TE_classifications_2015.txt
 REPEATMASKER_BED: resources/plus-repeats.repeatmasked.fixednames.bed
 
+S2RPLUS_RNAI_SE: upstream/tfrnai.se.gene.0.rds
+S2RPLUS_RNAI_RUNSELECTOR: resources/full_tfrnai_srarunselector.txt
+S2RPLUS_RNAI_BATCH: resources/batch_data.tsv.gz
+
 BBMASK_ENTROPY: 0.7
 BBMASK_W: 12
 

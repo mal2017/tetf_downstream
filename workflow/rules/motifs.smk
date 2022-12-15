@@ -113,10 +113,10 @@ rule plot_remap_peak_sea:
     input:
         tsv = rules.collect_remap_peak_sea.output.tsv
     output:
-        nhits_png = "results/figs/remap_peak_sea.nhits.png",
-        obs_exp_png = "results/figs/remap_peak_sea.obs_exp.png",
-        nhits_rds = "results/figs/remap_peak_sea.nhits.rds",
-        obs_exp_rds = "results/figs/remap_peak_sea.obs_exp.rds",
+        nhits_png = "results/plots/remap_peak_sea.nhits.png",
+        obs_exp_png = "results/plots/remap_peak_sea.obs_exp.png",
+        nhits_rds = "results/plots/remap_peak_sea.nhits.rds",
+        obs_exp_rds = "results/plots/remap_peak_sea.obs_exp.rds",
     script:
         "../scripts/motifs/plot_remap_peak_sea.R"
 

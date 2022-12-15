@@ -16,14 +16,14 @@ gsea.res <- read_rds(snakemake@input[["pairs"]])
 oi <- c("pan","ct","awd","mamo","Unr","NfI","vvl","CG16779")
 
 gsea.plt <- gsea %>%
-  filter(comparison %in% oi & comparison %in% filter(gsea.res,pvalue < 0.1)$RNAi) %>%
+  filter(comparison %in% filter(gsea.res,padj < 0.1)$RNAi) %>%
   mutate(gsea.plt = map2(gsea,comparison,
                          ~gseaplot(.x,geneSetID = .y,title = paste("Perturbation: ",.y,"RNAi in S2R+\n","Signature: TEs coex. w/",.y," in DGRP lines"), 
                                    by="runningScore")))
 
 stat_res <- gsea.res %>%
-  filter(RNAi %in% oi & pvalue < 0.1) %>%
-  mutate(label = paste0("NES=",round(NES,2),"\np=",format.pval(pvalue,3)))
+  filter(padj < 0.1) %>%
+  mutate(label = paste0("NES=",round(NES,2),"\npadj=",format.pval(pvalue,3)))
 
 gs <- gsea.plt %>% dplyr::select(comparison,gsea.plt) %>% 
   deframe() %>%
@@ -34,7 +34,7 @@ gs <- gsea.plt %>% dplyr::select(comparison,gsea.plt) %>%
   geom_path(color="tomato",size=rel(2)) +
   facet_wrap(~RNAi, ncol=1,scales="free") +
   geom_hline(yintercept = 0, linetype="dashed") +
-  geom_text_npc(data=stat_res,aes(npcx=0.1,npcy=0.2,label=label),vjust="bottom",hjust="left",size=unit(FONTSIZE,"pt")) + 
+  #geom_text_npc(data=stat_res,aes(npcx=0.1,npcy=0.2,label=label),vjust="bottom",hjust="left",size=1) + 
   ylab("Enrichment Score") +
   xlab("rank") +
   scale_x_continuous(expand = expansion(0))
@@ -42,5 +42,5 @@ gs <- gsea.plt %>% dplyr::select(comparison,gsea.plt) %>%
 
 o <- list(plot = gs, stats=stat_res)
 
-saveRDS(o,snakemake@output[["o"]])
-
+saveRDS(o,snakemake@output[["rds"]])
+ggsave(snakemake@output[["png"]], gs)
