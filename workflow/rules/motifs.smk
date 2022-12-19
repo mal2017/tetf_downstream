@@ -61,6 +61,14 @@ rule combine_xstreme_motifs:
     script:
         "../scripts/motifs/combine_xstreme_motifs.R"
 
+rule combine_xstreme_results:
+    input:
+        tsvs = aggregate_xstreme
+    output:
+        tsv = "results/analysis/motifs/combined_xstreme_results.tsv"
+    script:
+        "../scripts/motifs/combine_xstreme_results.R"
+
         
 checkpoint get_remap_peak_seqs:
     input:
@@ -100,14 +108,11 @@ def aggregate_sea(wildcards):
 
 rule collect_remap_peak_sea:
     input:
-        aggregate_sea
+        seas = aggregate_sea
     output:
         tsv = "results/analysis/motifs/remap_peak_sea.tsv.gz"
-    params:
-        seas = lambda wc: [x + "/sea.tsv" for x  in aggregate_sea(wc)]
     script:
         "../scripts/motifs/collect_remap_peak_sea.R"
-
 
 rule plot_remap_peak_sea:
     input:
@@ -120,7 +125,6 @@ rule plot_remap_peak_sea:
     script:
         "../scripts/motifs/plot_remap_peak_sea.R"
 
-
 rule compare_hmg_motifs_from_archbold14:
     input:
         meme = rules.combine_xstreme_motifs.output.meme,
@@ -130,3 +134,15 @@ rule compare_hmg_motifs_from_archbold14:
         archbold_motifs = "results/analysis/motifs/archbold14_motifs.tsv",
     script:
         "../scripts/motifs/compare_hmg_motifs_from_archbold14.R"
+
+rule plot_combined_motif_analysis_table:
+    input:
+        memes = rules.combine_xstreme_motifs.output.meme,
+        denovo = rules.combine_xstreme_results.output.tsv,
+        remap_enr = rules.collect_remap_peak_sea.output.tsv,
+        archbold_compr = rules.compare_hmg_motifs_from_archbold14.output.motif_comparison,
+    output:
+        png = "results/plots/combined_motif_analysis_table.png",
+        rda = "results/plots/combined_motif_analysis_table.rda",
+    script:
+        "../scripts/motifs/plot_combined_motif_analysis_table.R"

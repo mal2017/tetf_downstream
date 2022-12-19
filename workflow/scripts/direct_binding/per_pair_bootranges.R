@@ -8,7 +8,7 @@ library(progress)
 
 L_s <- ifelse(exists("snakemake"),as.numeric(snakemake@params[["L_s"]]),1e5)
 nseg <- ifelse(exists("snakemake"),as.numeric(snakemake@params[["nseg"]]),3)
-R <- ifelse(exists("snakemake"),as.numeric(snakemake@params[["R"]]),3)
+R <- ifelse(exists("snakemake"),as.numeric(snakemake@params[["R"]]),100)
 blockLength <- ifelse(exists("snakemake"),as.numeric(snakemake@params[["blockLength"]]),5e5)
 
 print(L_s)
@@ -19,7 +19,7 @@ print(blockLength)
 
 lms <- ifelse(exists("snakemake"),snakemake@input[["lms"]],
                    "upstream/final-models.collected-info.tsv.gz") %>%
-                   read_tsv() #%>% filter(significant_x)
+                   read_tsv() %>% filter(significant_x)
 
 chip <- ifelse(exists("snakemake"),snakemake@input[["remap"]],
                "results/resources/remap.gr.rds") %>%
@@ -43,6 +43,17 @@ ins <- keepStandardChromosomes(ins, pruning.mode = "coarse")
 ins <- sortSeqlevels(ins)
 ins <- sort(ins)
 names(ins) <- NULL
+
+s2chromstate <- ifelse(exists("snakemake"),snakemake@input[["chromstate"]],
+                         "resources/chromstate_s2_9state_r5todm6.bed.gz") %>%
+   rtracklayer::import()
+
+seqlevelsStyle(s2chromstate) <- "NCBI"
+seqlengths(s2chromstate) <- seqlengths(fa)[seqlevels(s2chromstate)]
+s2chromstate <- keepStandardChromosomes(s2chromstate, pruning.mode = "coarse")
+s2chromstate <- sortSeqlevels(s2chromstate)
+s2chromstate <- sort(s2chromstate)
+s2chromstate <- s2chromstate %>% mutate(state = str_extract(name,"\\d+(?=_)"))
 
 # in keeping with convention of the bootranges vignette,
 # i add an 'iter' field to the granges of interest with value zero
@@ -79,8 +90,8 @@ possibly_bootranges <- possibly(function(...) {
 
 # get TE/TF pairs to check
 res0 <- lms %>%
-  filter(gene_symbol %in% names(chip)) %>%
-  #filter(gene_symbol == "pan") %>%
+  #filter(gene_symbol %in% names(chip)) %>%
+  filter(gene_symbol == "pan") %>%
   dplyr::select(TF=gene_symbol,TE=feature.y) %>%
   distinct() #%>% head(1)
 
@@ -92,7 +103,7 @@ boot_df <- res0 %>%
   distinct() %>%
   #head(1) %>%
   mutate(ins.gr = map(TE,~{ins[ins$repeat_element == .x,c("repeat_element","iter")]})) %>%
-  mutate(boot.gr = map(ins.gr, possibly_bootranges, blockLength, seg=seg_cbs, R=R,withinChrom=F))
+  mutate(boot.gr = map(ins.gr, possibly_bootranges, blockLength, seg=s2chromstate, R=R,withinChrom=F))
 
 res <- left_join(res0,boot_df, by="TE") %>%
   drop_na()

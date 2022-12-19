@@ -12,8 +12,6 @@ s2rnai <- ifelse(exists("snakemake"),snakemake@input[["s2rnai"]],"results/plots/
   .$ne_vs_p
 
 s2rnai <- s2rnai + scale_color_grey(start = 0.6, end = 0.1) + theme(legend.position = c(1,1), legend.justification = c("right","top"))
-our_kds
-
 
 if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 2)
 

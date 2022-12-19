@@ -8,8 +8,8 @@ plan(multisession, workers = threads)
 
 lms <- ifelse(exists("snakemake"),snakemake@input[["lms"]],
                    "upstream/final-models.collected-info.tsv.gz") %>%
-  read_tsv() %>%
-  filter(significant_x)
+  read_tsv() #%>%
+  #filter(significant_x)
 
 
 ins <- ifelse(exists("snakemake"),snakemake@input[["anno_ins"]],
@@ -66,7 +66,7 @@ ins <- ins %>%
 res <- expand_grid(TF = tfs,TE = tes) %>%
   semi_join(lms, by=c(TF = "gene_symbol",TE="feature.y")) %>%
   #filter(TF == "Hr39" & TE == "17.6") %>%
-  #filter(TF %in% c("pan")) %>%
+  filter(TF %in% c("pan")) %>%
   #head(2) %>% # for testing
   mutate(cont_mat = future_map2(TF,TE,possibly(enrich_1te_1tf,otherwise = NULL),.progress = T,.options = furrr_options(seed = TRUE)))
 
@@ -84,6 +84,8 @@ res <- res %>%
   bind_rows(filter(res,map_lgl(cont_mat,is.null))) %>%
   ungroup() %>%
   arrange(p.value)
+
+res %>% mutate(padj = p.adjust(p.value, method="BH")) %>% relocate(padj)
 
 
 write_rds(res,snakemake@output[["rds"]])

@@ -38,6 +38,7 @@ rule per_pair_bootranges:
         txdb = rules.make_txdb.output.txdb,
         genome_fa = rules.ref_preproc.output.genome_fa,
         remap = rules.annotate_fixed_insertions.output.remap,
+        chromstate = config.get("S2_CHROMSTATE")
     output:
         rds = "results/analysis/direct_binding/per_pair_bootranges.rds",
         boots = "results/analysis/direct_binding/per_pair_bootranges.boots.rds",

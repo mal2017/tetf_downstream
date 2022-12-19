@@ -18,7 +18,7 @@ x <- assay(se,"counts")
 
 # set up filter
 filt <- parse_expr( "(((!str_detect(rownames(x),'FBgn')) & rowSums(x > 1) > 10) | (rowSums(x > 10) > 100)) & rowSums(x == 0) < 0.3*ncol(x)" )
-features_2_use <-  rownames(x0[eval(filt),])
+features_2_use <-  rownames(x[eval(filt),])
 
 x1 <- x[features_2_use,]
 
