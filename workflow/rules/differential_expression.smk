@@ -29,3 +29,23 @@ rule plot_this_study_kd_deseq2:
     png = "results/plots/this_study_kd_deseq2.png"
   script:
     "../scripts/differential_expression/plot_ourKD_deseq2.R"
+
+rule plot_kd_info:
+  input:
+    dds =  rules.this_study_kd_deseq2.output.dds,
+  output:
+    rds = "results/plots/kd_info.rds",
+    #png = "results/plots/kd_info.png"
+  script:
+    "../scripts/differential_expression/plot_kd_info.R"
+
+rule plot_s2rplus_lfc_waterfall:
+  input:
+    deg = rules.s2rplus_limma.output.tsv,
+    #lkup = rules.make_gene_symbol_lookup.output.tsv,
+    #mods = config.get("MERGED_MODELS"),
+  output:
+    rds = "results/plots/s2rplus_lfc_waterfall.rds",
+    png = "results/plots/s2rplus_lfc_waterfall.png"
+  script:
+    "../scripts/differential_expression/plot_s2rplus_lfc_waterfall.R"

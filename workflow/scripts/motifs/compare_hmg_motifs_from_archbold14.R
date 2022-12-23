@@ -18,7 +18,8 @@ motifs <- ifelse(exists("snakemake"),snakemake@input[["meme"]],
                  "results/analysis/motifs/combined_xstreme.meme") %>%
   read_meme()
 
-names(motifs) <- motifs %>% map_chr( `@`, altname)
+
+names(motifs) <- motifs %>% map_chr( `@`, name)
 
 degenerate_hmgs <- hmg_motifs_df %>%
   dplyr::select(nm,Sequence) %>%
@@ -33,9 +34,9 @@ all_motifs <- c(degenerate_hmgs, motifs)
 # of pearson's rho is skewed, so averaging after FZT makes more sense
 # I used the same approach to average the rho's for gene x gene correlation
 # among salmon replicates
+METHOD = "PCC"
+SCORE.STRAT= "fzt"
 compare_motifs2 <- function(m) {
-  METHOD = "PCC"
-  SCORE.STRAT= "fzt"
   
   mat <- compare_motifs(motifs = m,
                                    method = METHOD,
@@ -56,6 +57,11 @@ compare_motifs2 <- function(m) {
 
 motif_comparison <- compare_motifs2(all_motifs)
 
+motif_comparison$p <- motif_comparison$p %>%
+  as_tibble() %>%
+  filter(str_detect(subject,"pan")|str_detect(target,"pan")) %>%
+  mutate(motifs = map2(subject,target, ~{c(all_motifs[[.x]],all_motifs[[.y]])})) %>%
+  mutate(gg = map(motifs, ~view_motifs(.x,method = METHOD, score.strat = SCORE.STRAT, text.size = 5)))
 
 saveRDS(motif_comparison$p, snakemake@output[["motif_comparison"]])
 saveRDS(motif_comparison$sim, snakemake@output[["motif_similarity"]])

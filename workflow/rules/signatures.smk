@@ -18,6 +18,15 @@ rule plot_gene_group_gsea_volc:
     script:
         "../scripts/signatures/plot_gene_group_gsea_volc.R"
 
+rule plot_gene_group_gsea_table:
+    input:
+        gene_group_gsea = rules.gene_group_gsea.output.rds
+    output:
+        png = "results/plots/gene_group_gsea.table.png",
+        rda = "results/plots/gene_group_gsea.table.rda",
+    script:
+        "../scripts/signatures/plot_gene_group_gsea_table.R"
+
 rule ourKD_gsea:
     input:
         mods = config.get("MERGED_MODELS"),

@@ -24,9 +24,9 @@ intro_heats_female <- grid.grabExpr(draw(intro_heats$female_model_01))
 # make this one plot
 intro_scatter <- (Reduce(`+`,intro_scatter) + plot_layout(guides="collect")) & theme(legend.position = "bottom")
 
-if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 3)
+if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
 
-pageCreate(width = 7.5, height = 3, default.units = "inches", showGuides = interactive())
+pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = interactive())
 
 f1a <- plotRaster(cartoon_01, x = 0.625, y=0.05, just = c("left","top"),width = 1.25, height=1.5)
 
@@ -49,6 +49,8 @@ plotText(label = "C", fontsize = 7,
 plotText(label = "D", fontsize = 7,
          x = 0.25, y = 1.625, just = "center", default.units = "inches")
 
+plotText(label = "Figure 1", fontsize = 12,
+         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()
 

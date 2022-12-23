@@ -49,7 +49,7 @@ def aggregate_xstreme(wildcards):
     checkpoint_output = checkpoints.split_cons_tes_per_tf.get(**wildcards).output.odir
     wc_path = os.path.join(checkpoint_output, "{tf}/coex.fasta")
     tfs = glob_wildcards(wc_path).tf
-    tfs = ["pan","NfI","CG16779"]
+    tfs = ["pan"]
     return expand("results/analysis/motifs/xstreme_per_tf/{tf}/", tf=tfs)
 
 
@@ -102,7 +102,7 @@ def aggregate_sea(wildcards):
     tfs = glob_wildcards(wc_path).tf
     filter_wc_path = os.path.join(remap_checkpoint_output, "{tf}.fasta")
     filters = glob_wildcards(filter_wc_path).tf
-    filters = ["pan","NfI","CG16779"]
+    filters = ["pan"]
     return expand("results/analysis/motifs/sea_remap_peaks/{tf}", tf=[x for x in tfs if x in filters])
 
 

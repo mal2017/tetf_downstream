@@ -13,9 +13,9 @@ tf_gsea <- ifelse(exists("snakemake"),snakemake@input[["gg_gsea_volc"]],"results
 pirna_box <- pirna_box & scale_fill_grey(start = 0, end = 0.9)
 tf_gsea <- tf_gsea + scale_color_grey(start=0.6,end=0.1) + guides(color=F)
 
-if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 2)
+if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
 
-pageCreate(width = 7.5, height = 2, default.units = "inches", showGuides = interactive())
+pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = interactive())
 
 pa <- plotGG(plot = pirna_box, x = 0.25, y=0.05, just = c("left","top"),width = 5, height=2)
 
@@ -26,6 +26,9 @@ plotText(label = "A", fontsize = 7,
 
 plotText(label = "B", fontsize = 7,
          x = 5.125, y = 0.25, just = "center", default.units = "inches")
+
+plotText(label = "Figure 2", fontsize = 12,
+         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()
 

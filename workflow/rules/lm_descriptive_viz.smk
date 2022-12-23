@@ -62,47 +62,42 @@ rule plot_variance_explained_overview_boxplot:
     script:
         "../scripts/lm_descriptive_viz/plot_variance_explained_overview_boxplots.R"
 
-rule plot_piRNA_genes_in_lms:
+rule plot_intro_histograms:
     input:
-        mods = config.get("MERGED_MODELS"),
-        pirna = rules.make_pirna_gene_list.output.tsv,
+        mods = config.get("MERGED_MODELS")
     output:
-        ntotal_ecdf_rds = "results/plots/pirna_genes_in_lms.ntotal_ecdf.rds",
-        ntotal_ecdf_png = "results/plots/pirna_genes_in_lms.ntotal_ecdf.png",
+        rds="results/plots/plot_intro_histograms.rds",
+        png = "results/plots/plot_intro_histograms.png",
     script:
-        "../scripts/coexpression/plot_piRNA_genes_in_lms.R"
+        "../scripts/lm_descriptive_viz/plot_intro_histograms.R"
 
 
-# rule plot_intro_histograms:
-#     input:
-#         mods = rules.filter_models.output.filtered_tsv,
-#     output:
-#         rds="results/plots/plot_intro_histograms.rds"
-#     script:
-#         "../scripts/coexpression/plot_intro_histograms.R"
+rule plot_sex_specific_barplot:
+    input:
+        mods = config.get("MERGED_MODELS")
+    output:
+        rds = "results/plots/sex_specific_barplot.rds",
+        png = "results/plots/sex_specific_barplot.png",
+    script:
+        "../scripts/lm_descriptive_viz/plot_sex_specific_barplot.R"
 
+rule plot_consistency:
+    """
+    Evaluate consistency of conclusions for terms that are shared by all models for a given TE.
+    e.g. copy number and wolbachia
+    """
+    input:
+        mods = config.get("MERGED_MODELS")
+    output:
+        rds = "results/plots/consistency.rds",
+        png = "results/plots/consistency.png",
+    script:
+        "../scripts/lm_descriptive_viz/plot_consistency.R"
 
-
-
-# rule plot_coef_waterfall:
-#     input:
-#         mods = rules.filter_models.output.filtered_tsv
-#     output:
-#         rds = "results/plots/plot_coef_waterfall.rds"
-#     script:
-#         "../scripts/coexpression/plot_coef_waterfall.R"
-
-
-# rule plot_tx_related_in_lms:
-#     input:
-#         mods = rules.filter_models.output.filtered_tsv,
-#         tfs = "data/Drosophila_melanogaster_TF.txt",
-#         cofacs = "data/Drosophila_melanogaster_TF_cofactors.txt",
-#         lkup = rules.make_gene_symbol_lookup.output.tsv,
-#     output:
-#         rds = "results/plots/plot_tx_related_in_lms.rds"
-#     script:
-#         "../scripts/coexpression/plot_tx-related_in_lms.R"
-
-
-
+rule plot_exemplary_scatters:
+    input:
+        mods = config.get("MERGED_MODELS")
+    output:
+        rds = "results/plots/exemplary_scatters.rds", # no png because this is many plots
+    script:
+        "../scripts/lm_descriptive_viz/plot_exemplary_scatters.R"
