@@ -80,19 +80,66 @@ checkpoint get_remap_peak_seqs:
     script:
         "../scripts/motifs/get_remap_peak_seqs.R"
     
+rule get_inverted_remap_peak_seqs:
+    input:
+        bed = rules.annotate_fixed_insertions.output.remap,
+        rpm = config.get("REPEATMASKER_BED"),
+        fa = config.get("GENOME_FA")
+    params:
+        tf = "{tf}"
+    output:
+        fa = "results/analysis/motifs/inverted_remap_peaks/{tf}.fasta"
+    script:
+        "../scripts/motifs/get_inverted_remap_peak_seqs.R"
+
 
 rule sea_remap_peaks:
     input:
         dir = rules.get_remap_peak_seqs.output.odir,
-        xstreme = rules.combine_xstreme_motifs.output.meme #rules.xstreme_per_tf.output.odir,
+        nfa = rules.get_inverted_remap_peak_seqs.output.fa,
+        #xstreme = rules.combine_xstreme_motifs.output.meme # to run on all motifs, comment this out and delete '/combined.meme' from sea command
+        xstreme = rules.xstreme_per_tf.output.odir,
     output:
         odir = directory("results/analysis/motifs/sea_remap_peaks/{tf}")
     singularity:
         "docker://memesuite/memesuite:5.5.0"
     shell:
         """
-        sea -p '{input.dir}/{wildcards.tf}.fasta' -m '{input.xstreme}' -oc '{output.odir}'
+        sea -p '{input.dir}/{wildcards.tf}.fasta' -n {input.nfa} -m '{input.xstreme}/combined.meme' -oc '{output.odir}'
         """
+
+rule xstreme_remap_peaks:
+    """
+    --n '{input.nfa}' \
+    """
+    input:
+        dir = rules.get_remap_peak_seqs.output.odir,
+        #nfa = rules.get_inverted_remap_peak_seqs.output.fa,
+    output:
+        odir = directory("results/analysis/motifs/xstreme_remap_peaks/{tf}/")
+    threads:
+        8
+    singularity:
+        "docker://memesuite/memesuite:5.5.0"
+    shell:
+        """
+        xstreme --oc '{output.odir}' \
+            -p '{input.dir}/{wildcards.tf}.fasta' \
+            --meme-p {threads}
+        """
+
+# rule sea_inverted_remap_peaks:
+#     input:
+#         fa =  rules.get_inverted_remap_peak_seqs.output.fa,
+#         xstreme = rules.combine_xstreme_motifs.output.meme #rules.xstreme_per_tf.output.odir,
+#     output:
+#         odir = directory("results/analysis/motifs/sea_inverted_remap_peaks/{tf}")
+#     singularity:
+#         "docker://memesuite/memesuite:5.5.0"
+#     shell:
+#         """
+#         sea -p {input.fa} -m '{input.xstreme}' -oc '{output.odir}'
+#         """
 
 def aggregate_sea(wildcards):
     lms_checkpoint_output = checkpoints.split_cons_tes_per_tf.get(**wildcards).output.odir
@@ -102,7 +149,7 @@ def aggregate_sea(wildcards):
     tfs = glob_wildcards(wc_path).tf
     filter_wc_path = os.path.join(remap_checkpoint_output, "{tf}.fasta")
     filters = glob_wildcards(filter_wc_path).tf
-    filters = ["pan"]
+    #filters = ["pan","NfI"]
     return expand("results/analysis/motifs/sea_remap_peaks/{tf}", tf=[x for x in tfs if x in filters])
 
 

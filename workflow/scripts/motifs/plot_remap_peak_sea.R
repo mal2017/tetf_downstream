@@ -5,8 +5,10 @@ df <- ifelse(exists("snakemake"), snakemake@input[["tsv"]],
              "results/analysis/motifs/remap_peak_sea.tsv.gz") %>%
   read_tsv()
 
-g_bar <- df %>% group_by(DB) %>%
-  summarise(`>0 de novo motif overrep. in REMAP peaks` = any(QVALUE < 0.1)) %>%
+g_bar <- df %>% 
+  mutate(padj = p.adjust(PVALUE,method="bonferroni")) %>%
+  group_by(DB) %>%
+  summarise(`>0 de novo motif overrep. in REMAP peaks` = any(padj < 0.001)) %>%
   ggplot(aes(`>0 de novo motif overrep. in REMAP peaks`)) +
   geom_bar()
 

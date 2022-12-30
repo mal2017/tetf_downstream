@@ -59,7 +59,7 @@ motif_comparison <- compare_motifs2(all_motifs)
 
 motif_comparison$p <- motif_comparison$p %>%
   as_tibble() %>%
-  filter(str_detect(subject,"pan")|str_detect(target,"pan")) %>%
+  #filter(str_detect(subject,"pan")|str_detect(target,"pan")) %>%
   mutate(motifs = map2(subject,target, ~{c(all_motifs[[.x]],all_motifs[[.y]])})) %>%
   mutate(gg = map(motifs, ~view_motifs(.x,method = METHOD, score.strat = SCORE.STRAT, text.size = 5)))
 

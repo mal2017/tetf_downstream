@@ -49,3 +49,14 @@ rule plot_kd_gene_coefs_boxplot:
         png = "results/plots/kd_gene_coefs_boxplot.png",
     script:
         "../scripts/specific_genes/plot_kd_gene_coefs_boxplot.R"
+
+rule remap_peaks_near_pirna_genes:
+    input:
+        pirna = rules.make_pirna_gene_list.output.tsv,
+        remap = rules.annotate_fixed_insertions.output.remap,
+        txdb = rules.make_txdb.output.txdb,
+    output:
+        rds = "results/analysis/specific_genes/remap_peaks_near_pirna_genes.rds",
+        tsv = "results/analysis/specific_genes/remap_peaks_near_pirna_genes.tsv",
+    script:
+        "../scripts/specific_genes/remap_peaks_near_pirna_genes.R"
