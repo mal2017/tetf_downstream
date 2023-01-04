@@ -20,10 +20,39 @@ mean.qp <- x %>%
 lms %>% 
   filter(gene_symbol == "pan") %>%
   #filter(significant_x) %>%
+  dplyr::select(feature.y, significant_x) %>%
+  group_by(feature.y) %>%
+  summarise(significant_x = any(significant_x)) %>%
+  left_join(mean.qp,by=c(feature.y = "seqnames")) %>%
+  ggplot(aes(significant_x,score)) +
+  geom_boxplot(outlier.shape = NA) +
+  #geom_jitter() +
+  ggpubr::stat_compare_means(method = "wilcox.test") +
+  xlab("")
+
+
+lms %>% 
+  filter(gene_symbol == "pan") %>%
+  #filter(significant_x) %>%
+  left_join(mean.qp,by=c(feature.y = "seqnames")) %>%
+  ggplot(aes(significant_x,score)) +
+  geom_boxplot(outlier.shape = NA) +
+  #geom_jitter() +
+  ggpubr::stat_compare_means(method = "wilcox.test") +
+  xlab("TE coexpressed with pan?") +
+  ylab("fold enrichment") +
+  facet_wrap(~model)
+
+
+lms %>% 
+  filter(gene_symbol == "pan") %>%
+  #filter(significant_x) %>%
   left_join(mean.qp,by=c(feature.y = "seqnames")) %>%
   ggplot(aes(score,estimate.qnorm, color=significant_x)) +
   geom_point() +
   facet_wrap(~model)
+
+
 
 ggplot(aes(reorder(seqnames,score),score)) +
   geom_point() +

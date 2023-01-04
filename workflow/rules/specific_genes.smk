@@ -6,6 +6,7 @@ rule plot_pirna_genes_in_lms:
         rds = "results/plots/pirna_genes_in_lms.rds",
         #stats_rds = "results/analysis/specific_genes/pirna_genes_in_lms.rds",
         png = "results/plots/pirna_genes_in_lms.png",
+        json = "results/stats/pirna_genes_in_lms.json",
     script:
         "../scripts/specific_genes/plot_piRNA_genes_in_lms.R"
 
@@ -50,13 +51,31 @@ rule plot_kd_gene_coefs_boxplot:
     script:
         "../scripts/specific_genes/plot_kd_gene_coefs_boxplot.R"
 
-rule remap_peaks_near_pirna_genes:
+rule remap_peaks_near_pirna_genes_contingency:
     input:
         pirna = rules.make_pirna_gene_list.output.tsv,
         remap = rules.annotate_fixed_insertions.output.remap,
         txdb = rules.make_txdb.output.txdb,
     output:
-        rds = "results/analysis/specific_genes/remap_peaks_near_pirna_genes.rds",
-        tsv = "results/analysis/specific_genes/remap_peaks_near_pirna_genes.tsv",
+        res_rds = "results/analysis/specific_genes/remap_peaks_near_pirna_genes_contingency.rds",
+        rds = "results/plots/remap_peaks_near_pirna_genes_contingency.pirna-more-regulated.rds",
+        png = "results/plots/remap_peaks_near_pirna_genes_contingency.pirna-more-regulated.png",
+    threads:
+        4
     script:
-        "../scripts/specific_genes/remap_peaks_near_pirna_genes.R"
+        "../scripts/specific_genes/remap_peaks_near_pirna_genes_contingency.R"
+
+
+# rule remap_peaks_near_pirna_genes_dist:
+#     """
+#     orthologous approach that shows that the peaks are very nearby piRNA genes
+#     """
+#     input:
+#         pirna = rules.make_pirna_gene_list.output.tsv,
+#         remap = rules.annotate_fixed_insertions.output.remap,
+#         txdb = rules.make_txdb.output.txdb,
+#     output:
+#         rds = "results/analysis/specific_genes/remap_peaks_near_pirna_genes.rds",
+#         tsv = "results/analysis/specific_genes/remap_peaks_near_pirna_genes.tsv",
+#     script:
+#         "../scripts/specific_genes/remap_peaks_near_pirna_genes.R"

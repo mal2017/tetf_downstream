@@ -1,22 +1,29 @@
 library(tidyverse)
 
-#seas <- Sys.glob("results/analysis/motifs/sea_remap_peaks/*/")
+#seas_fls <- Sys.glob("results/analysis/motifs/sea_remap_peaks/*/")
 
 # get list of snakemake inputs
-seas <- snakemake@input[["seas"]] 
+seas_fls <- snakemake@input[["seas"]] 
 
-seas <- seas %>% paste0("/sea.tsv")
+seas <- seas_fls %>% paste0("/sea.tsv")
 
 seas <- seas %>% set_names(.,str_extract(.,"(?<=peaks\\/).+?(?=\\/)"))
 
 seas <- seas  %>%
-  map_df(read_tsv, comment="#",.id="peak_set")
+  #head() %>%
+  map(read_tsv, comment="#")
 
+# remove empty
+seas <- seas[map_lgl(seas,~{nrow(.x) >= 1})]
+
+seas <- seas %>% 
+  map(~mutate(.x, ID=as.character(ID))) %>% 
+  bind_rows(.id="peak_set")
 
 # mutate DB column to contain the name of the directory combined.meme is in
 seas <- seas %>% 
-  #mutate(te_group = str_extract(ID,regex(".*?(?=::)"))) %>%
-  separate(ID, c("te_group","ID"),sep = "::") %>%
+  mutate(te_group = str_extract(DB,regex("(?<=per_tf\\/).+(?=\\/combined.meme)"))) %>%
+  #separate(ID, c("te_group","ID"),sep = "::") %>%
   relocate(te_group)
 
 # export to snakemake output as tsv

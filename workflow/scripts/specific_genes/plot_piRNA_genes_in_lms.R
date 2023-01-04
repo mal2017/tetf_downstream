@@ -32,8 +32,8 @@ s_sig <- cts %>%
   split(.,.$model) %>%
   map_df(
     ~{
-      bind_rows(Handler2013 = broom::tidy(t.test(sig~Handler2013,data=.,alternative="two.sided")),
-                Czech2013 = broom::tidy(t.test(sig~Czech2013,data=.,alternative="two.sided")),.id="publication")
+      bind_rows(Handler2013 = broom::tidy(wilcox.test(sig~Handler2013,data=.,alternative="two.sided")),
+                Czech2013 = broom::tidy(wilcox.test(sig~Czech2013,data=.,alternative="two.sided")),.id="publication")
     },
     .id="model")
 
@@ -43,8 +43,8 @@ s_est <- est %>%
   split(.,.$model) %>%
   map_df(
     ~{
-      bind_rows(Handler2013 = broom::tidy(t.test(estimate.qnorm~Handler2013,data=.,alternative="two.sided")),
-                Czech2013 = broom::tidy(t.test(estimate.qnorm~Czech2013,data=.,alternative="two.sided")),.id="publication")
+      bind_rows(Handler2013 = broom::tidy(wilcox.test(estimate.qnorm~Handler2013,data=.,alternative="two.sided")),
+                Czech2013 = broom::tidy(wilcox.test(estimate.qnorm~Czech2013,data=.,alternative="two.sided")),.id="publication")
     },
     .id="model")
 
@@ -53,11 +53,15 @@ s_var <- est %>%
   split(.,.$model) %>%
   map_df(
     ~{
-      bind_rows(Handler2013 = broom::tidy(t.test(pct.var.expl~Handler2013,data=.,alternative="two.sided")),
-                Czech2013 = broom::tidy(t.test(pct.var.expl~Czech2013,data=.,alternative="two.sided")),.id="publication")
+      bind_rows(Handler2013 = broom::tidy(wilcox.test(pct.var.expl~Handler2013,data=.,alternative="two.sided")),
+                Czech2013 = broom::tidy(wilcox.test(pct.var.expl~Czech2013,data=.,alternative="two.sided")),.id="publication")
     },
     .id="model")
 
+stats_to_json <- bind_rows(pirna_var_exp_vs_others = s_var,
+          pirna_coex.score_vs_others = s_est,
+          pirna_n_sig_vs_others = s_sig, .id="stat_group") %>%
+  nest(-model,-stat_group)
 
 # ------------------------------------------------------------------------------
 # begin plotting
@@ -121,3 +125,4 @@ g <- g_var + g_est + g_cts + plot_layout(guides="collect")
 #saveRDS(list(coex.score = s_est, var.expl = s_var, nsig = s_sig), snakemake@output[["stats_rds"]])
 ggsave(snakemake@output[["png"]],g)
 saveRDS(g,snakemake@output[["rds"]])
+jsonlite::write_json(stats_to_json, snakemake@output$json)
