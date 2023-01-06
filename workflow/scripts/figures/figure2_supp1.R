@@ -17,18 +17,18 @@ if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
 
 pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = interactive())
 
-pa <- plotGG(plot = pirna_hist, x = 1.25, y=0.05, just = c("left","top"),width = 5, height=2)
+#pa <- plotGG(plot = pirna_hist, x = 1.25, y=0.05, just = c("left","top"),width = 5, height=2)
 
-pb <- plotGG(plot = gtg, x = 0.25, y=2.5, just = c("left","top"),width = 7.25, height=7)
+pb <- plotGG(plot = gtg, x = 0.25, y=0.5, just = c("left","top"),width = 7.25, height=7)
 
-plotText(label = "A", fontsize = 7,
-         x = 1, y = 0.25, just = "center", default.units = "inches")
+#plotText(label = "A", fontsize = 7,
+#         x = 1, y = 0.25, just = "center", default.units = "inches")
 
-plotText(label = "B", fontsize = 7,
-         x = 0.75, y = 2.5, just = "center", default.units = "inches")
+#plotText(label = "B", fontsize = 7,
+#         x = 0.75, y = 2.5, just = "center", default.units = "inches")
 
-plotText(label = "Figure 2 - Supplement 1", fontsize = 12,
-         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
+#plotText(label = "Figure 2 - Supplement 1", fontsize = 12,
+#         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()
 

@@ -23,6 +23,11 @@ res2 <- res$adjusted %>%
 
 select_pirna_oi <- . %>% filter(feature %in% pirna$gene_ID)
 
+# prettify comparison names
+res2 <- res2 %>%
+  separate(RNAi, into=c("kd","sex","tissue","driver","compared_to"), sep = "_",extra = "merge",) %>%
+  mutate(RNAi2 = sprintf("%s-RNAi/UAS::%s (%s %s)",kd, driver,sex, tissue))
+
 g <- res2 %>%
   left_join(pirna, by=c(feature="gene_ID")) %>%
   mutate(oi = feature %in% pirna$gene_ID) %>%
@@ -31,7 +36,7 @@ g <- res2 %>%
   ggplot(aes(log2FoldChange,-log10(padj), color=padj<0.1,label=gene_symbol)) +
   geom_point(size=rel(0.2)) +
   ggrepel::geom_text_repel(data = . %>% filter(oi & padj < 0.1), max.iter = 10000, color="black") +
-  facet_wrap(~RNAi)
+  facet_wrap(~RNAi2)
 
 
 write_rds(g, snakemake@output[["rds"]])

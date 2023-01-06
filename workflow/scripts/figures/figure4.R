@@ -28,30 +28,30 @@ slaidina <- slaidina$pan + slaidina$pan_core_enrich &
 
 slaidina <- slaidina + scale_size(range=0)
 
-our_kds <- our_kds + guides(color="none") + scale_color_grey(start=0.6, end=0.3)
+our_kds <- our_kds + guides(color="none") + scale_color_grey(start=0.6, end=0.3) + facet_wrap(~RNAi2, nrow=1)
 
 
-if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
+if (!interactive()) pdf(snakemake@output[["pdf"]],width = 8.5, height = 11)
 
-pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = interactive())
+pageCreate(width = 8.5, height = 11, default.units = "inches", showGuides = interactive())
 
-pa <- plotGG(plot = our_kds, x = 0.05, y=0.05, just = c("left","top"),width = 4, height=4)
+pa <- plotGG(plot = our_kds, x = 0.5, y=0.15, just = c("left","top"),width = 7.4, height=2)
 
-pb <- plotGG(plot = gtg, x = 4.5, y=-0.4, just = c("left","top"),width = 2.75, height=3)
+pb <- plotGG(plot = gtg, x = 0.2125, y=2.2, just = c("left","top"),width = 2.75, height=3)
 
-pc <- plotGG(plot=slaidina, x = 3.9, y=2.1, just = c("left","top"),width = 3.7, height=2)
+pc <- plotGG(plot=slaidina, x = 3.3, y=2.5, just = c("left","top"),width = 4.8, height=2.7)
 
 plotText(label = "A", fontsize = 7,
-         x = 0.125, y = 0.125, just = "center", default.units = "inches")
+         x = 0.5, y = 0.125, just = "center", default.units = "inches")
 
 plotText(label = "B", fontsize = 7,
-         x = 4.375, y = 0.125, just = "center", default.units = "inches")
+         x = 0.25, y = 2.25, just = "center", default.units = "inches")
 
 plotText(label = "C", fontsize = 7,
-         x = 4.375, y = 2, just = "center", default.units = "inches")
+         x = 3.25, y = 2.25, just = "center", default.units = "inches")
 
 plotText(label = "Figure 4", fontsize = 12,
-         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
+         x = 0.1, y = 10.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()
 

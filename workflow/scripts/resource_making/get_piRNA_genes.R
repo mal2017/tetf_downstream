@@ -15,7 +15,7 @@ czech_path <- snakemake@input[["czech"]]
 lkup <- read_tsv(lkup_path)
 
 handler <- readxl::read_xlsx(handler_path, skip = 1) %>% 
-  filter(staining...6 > 1) %>% # this is a low bar
+  filter(staining...6 > 1.5) %>% # this is a low bar
   dplyr::select(gene_symbol=Symbol,annotation_ID=CG) %>%
   distinct()
 

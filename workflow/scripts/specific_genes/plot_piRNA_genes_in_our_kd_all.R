@@ -26,7 +26,8 @@ g <- res2 %>%
   ggplot(aes(log2FoldChange,-log10(padj), color=padj<0.1,label=gene_symbol)) +
   geom_point(size=rel(0.2)) +
   ggrepel::geom_text_repel(data = . %>% filter(oi & padj < 0.1), max.iter = 10000, color="black") +
-  facet_wrap(~RNAi, scales = "free")
+  facet_wrap(~RNAi, scales = "free") +
+  theme(strip.text = element_text(size=rel(0.5)))
 
 
 write_rds(g, snakemake@output[["rds"]])

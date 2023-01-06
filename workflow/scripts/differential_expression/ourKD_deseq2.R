@@ -30,6 +30,8 @@ colData(se) <- colData(se) %>%
 se <- se [rownames(se) %in% allowed_genes$gene_ID | 
                !str_detect(rownames(se),"FBgn"),]
 
+se <- se[,se$driver %in% c("aTub","tj","Mef2.R")]
+
 # ----------- count filtering --------------------------------------------------
 dds.pre <- DESeqDataSet(se,~ 1)
 
@@ -78,10 +80,6 @@ contrasts <- list(CG16779.head = c("knockdown2","CG16779_female_head_Mef2.R","co
                   Unr = c("knockdown2","Unr_female_head_Mef2.R","control_female_head_Mef2.R"),
                   NfI = c("knockdown2","NFI_female_head_Mef2.R","control_female_head_Mef2.R"),
                   vvl = c("knockdown2","vvl_female_head_Mef2.R","control_female_head_Mef2.R"),
-                  ct  = c("knockdown2","ct_female_gonad_C587","control_female_gonad_C587"),
-                  mamo = c("knockdown2","mamo_female_gonad_C587","control_female_gonad_C587"),
-                  awd = c("knockdown2","awd_female_gonad_C587","control_female_gonad_C587"),
-                  CG16779.c587.ovary = c("knockdown2","CG16779_female_gonad_C587","control_female_gonad_C587"),
                   pan.testis = c("knockdown2","pan_male_gonad_aTub","control_male_gonad_aTub"),
                   pan.tj.ovary = c("knockdown2","pan_female_gonad_tj","control_female_gonad_tj"),
                   CG16779.testis = c("knockdown2","CG16779_male_gonad_aTub","control_male_gonad_aTub"),
@@ -105,9 +103,6 @@ res_list <- map(dds_list,get_res)
 dds.testis <- DESeqDataSet(se[,se$tissue == "male_gonad"],~ knockdown2)
 dds.testis$knockdown2 <- relevel(dds.testis$knockdown2,ref="control_male_gonad_aTub")
 
-dds.ovary_c587 <- DESeqDataSet(se[,str_detect(se$tissue,"female_gonad") & se$driver == "C587"],~knockdown2)
-dds.ovary_c587$knockdown2 <- relevel(dds.ovary_c587$knockdown2, ref = "control_female_gonad_C587")
-
 dds.ovary_tj <- DESeqDataSet(se[,str_detect(se$tissue,"female_gonad") & se$driver == "tj"],~knockdown2)
 dds.ovary_tj$knockdown2 <- relevel(dds.ovary_tj$knockdown2, ref = "control_female_gonad_tj")
 
@@ -115,7 +110,6 @@ dds.female_head <- DESeqDataSet(se[,str_detect(se$tissue,"female_head")],~knockd
 dds.female_head$knockdown2 <- relevel(dds.female_head$knockdown2, ref = "control_female_head_Mef2.R")
 
 dds_list_indiv <- list(split.testis.raw=dds.testis,
-                 split.ovary.c587.raw=dds.ovary_c587,
                  split.ovary.tj.raw=dds.ovary_tj,
                  split.head.raw=dds.female_head)
 

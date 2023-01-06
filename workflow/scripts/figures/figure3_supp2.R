@@ -15,6 +15,9 @@ waterfall <- ifelse(exists("snakemake"),snakemake@input[["waterfall"]],
 
 # edits ---------------
 
+waterfall <- waterfall + xlab("mean TE LFC rank")
+
+
 if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
 
 pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = interactive())

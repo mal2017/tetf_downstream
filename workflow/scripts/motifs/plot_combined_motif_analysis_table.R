@@ -16,38 +16,33 @@ denovo <- ifelse(exists("snakemake"), snakemake@input[["denovo"]],
   read_tsv() %>%
   mutate(ALT_ID = paste(ID,ALT_ID,sep='-'))
 
-remap_enr <- ifelse(exists("snakemake"), snakemake@input[["remap_enr"]], 
-                 "results/analysis/motifs/remap_peak_sea.tsv.gz") %>% 
-  read_tsv()
-
-remap_enr <- remap_enr %>% filter(map2_lgl(DB, peak_set, str_detect)) %>%
-  mutate(te_group = peak_set)
-
 archbold_compr <- ifelse(exists("snakemake"), snakemake@input[["archbold_compr"]], 
                     "results/analysis/motifs/archbold14_motif_comparison.rds") %>% 
   read_rds()
 
+# make a joinable column
+archbold_compr <- archbold_compr %>%
+  mutate(CONSENSUS = str_remove(target,"pan::\\d+-"))
+
 tab <- denovo %>%
-  left_join(remap_enr, by=c("te_group","ALT_ID","CONSENSUS"), suffix = c(".TEs",".peaks")) %>%
-  dplyr::select(te_group, peak_set, CONSENSUS, 
-                starts_with("TP%"), starts_with("PVALUE"), ALT_ID) %>%
-  mutate(across(starts_with("PVALUE"),p.adjust,method="BH",.names = "adj{.col}")) %>%
-  #filter(if_all(starts_with("adjPV"), ~{.x < 0.1})) %>%
-  arrange(adjPVALUE.peaks) %>%
+  left_join(archbold_compr) %>%
+  filter(padj < 0.1) %>%
+  dplyr::select(te_group, CONSENSUS, EVALUE, estimated_fdr, padj, ALT_ID, gg) %>%
   mutate(motif = map2(te_group, ALT_ID, ~memes[[paste0(.x,"::",.y)]])) %>%
   mutate(logo  = map(motif, universalmotif::view_motifs))
 
-
 for_table <- tab %>% 
-  filter(te_group == "pan" & peak_set == "pan") %>%
-  dplyr::select(logo, contains("TP"), contains("adjP")) %>%
-  mutate(across(contains("%"), paste0, "%")) %>%
-  mutate(across(contains("VALUE"), format.pval, 2)) %>%
-  dplyr::rename_with(~str_squish(str_replace_all(.x,"TP|\\."," ")), .cols = contains("TP%")) %>%
-  dplyr::rename_with(~str_replace_all(.x,"adjPVALUE\\.","padj "), .cols = contains("adj"))
-  
+  group_by(CONSENSUS) %>%
+  slice_min(padj) %>%
+  ungroup() %>%
+  filter(padj <0.1) %>%
+  filter(te_group == "pan") %>%
+  dplyr::select(logo, `E-value`=EVALUE, `est. FDR` = estimated_fdr, padj) %>%
+  #mutate(across(contains("%"), paste0, "%")) %>%
+  mutate(across(contains("VALUE")|contains("padj")|contains("FDR"), format.pval, 2))
 
 gtg <- for_table %>%
+  arrange(`est. FDR`) %>%
   gt() %>%
   text_transform(
     locations = cells_body(columns = logo),
@@ -60,8 +55,9 @@ gtg <- for_table %>%
              subtitle = md("found in TEs coexpressed with *pan*")) %>%
   cols_width(logo~px(200),
              everything()~px(100)) %>%
-  tab_spanner(label = "found in", columns = c(`% TEs`, `% peaks`)) %>%
-  tab_spanner(label='enrichment significance', columns = c(`padj TEs`, `padj peaks`))
+  tab_spanner(label = "STREME", columns = c(`E-value`,`est. FDR`)) %>%
+  tab_spanner(label='similarity to HMG motif', columns = c(`padj`)) %>%
+  cols_align("center")
 
 gtsave_extra(gtg, filename = snakemake@output[["png"]],zoom = 2, vwidth=600, vheight=1800)
-save(gtg, for_table, file = snakemake@output[["rda"]])
+save(gtg, for_table, tab, file = snakemake@output[["rda"]])

@@ -36,20 +36,32 @@ all_motifs <- c(degenerate_hmgs, motifs)
 # among salmon replicates
 METHOD = "PCC"
 SCORE.STRAT= "fzt"
+RELATIVE_ENTROPY = F
+NORMALIZE_SCORES=T
+USETYPE="ICM"
 compare_motifs2 <- function(m) {
   
   mat <- compare_motifs(motifs = m,
                                    method = METHOD,
+                        normalise.scores = NORMALIZE_SCORES,
+                        relative_entropy = RELATIVE_ENTROPY,
+                        use.type = USETYPE,
                                    score.strat = SCORE.STRAT)
   
   p_df <- compare_motifs(motifs = m, 
                                compare.to = 1:length(all_motifs),
                                method = METHOD,
+                              relative_entropy = RELATIVE_ENTROPY,
+                                max.p=1,#max.e = 1,
+                         normalise.scores = NORMALIZE_SCORES,
+                              use.type = USETYPE,
                                score.strat = SCORE.STRAT)
   
   p_df <- p_df[p_df$subject != p_df$target,]
   
-  p_df$padj <- p.adjust(p_df$Pval, method="BH")
+  p_df <- p_df[!str_detect(p_df$target,"Archbold") & str_detect(p_df$subject,"Archbold"),]
+  
+  p_df$padj <- p.adjust(p_df$Pval, method="bonferroni")
   
   return(list(p=p_df, sim = mat))
 }
@@ -61,18 +73,27 @@ motif_comparison$p <- motif_comparison$p %>%
   as_tibble() %>%
   #filter(str_detect(subject,"pan")|str_detect(target,"pan")) %>%
   mutate(motifs = map2(subject,target, ~{c(all_motifs[[.x]],all_motifs[[.y]])})) %>%
-  mutate(gg = map(motifs, ~view_motifs(.x,method = METHOD, score.strat = SCORE.STRAT, text.size = 5)))
+  mutate(gg = map(motifs, ~view_motifs(.x,method = METHOD, score.strat = SCORE.STRAT, text.size = 7,  normalise.scores = NORMALIZE_SCORES, use.type = USETYPE)))
 
 saveRDS(motif_comparison$p, snakemake@output[["motif_comparison"]])
 saveRDS(motif_comparison$sim, snakemake@output[["motif_similarity"]])
 write_tsv(hmg_motifs_df,snakemake@output[["archbold_motifs"]])
 
 
+
 # # ------------------------------------------------------------------------------
-motif_comparison$p %>% 
-  as_tibble() %>%
-  filter(padj < 0.1) %>%
-   filter(!(str_detect(subject,"Arch") & str_detect(target,"Arch")))
+ motif_comparison$p %>% 
+   as_tibble() %>%
+   filter(padj < 0.1) %>%
+    filter(!str_detect(target,"Arch") | !str_detect(subject,"Arch"))
+# 
+# motif_comparison$p %>% 
+#   as_tibble() %>%
+#   filter(padj < 0.1) %>%
+#   group_by(target) %>%
+#   slice_min(Pval) %>%
+#   pull(gg)
+
 # 
 # # ------------------------------------------------------------------------------
 # 

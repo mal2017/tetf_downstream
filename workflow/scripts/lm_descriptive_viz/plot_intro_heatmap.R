@@ -120,21 +120,21 @@ hms$combined <- hms$combined +
   rowAnnotation(link = anno_mark(at = which(n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme)), 
                                  labels = n_hits_and_extreme[n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme),"gene_symbol"], 
                                  link_width = unit(1,"mm"),
-                                 labels_gp = gpar(fontsize = 5), padding = unit(1, "mm")))
+                                 labels_gp = gpar(fontsize = 5), padding = unit(2, "mm")))
 
 hms$male_model_01<- hms$male_model_01 +
   #Heatmap(n_hits_and_extreme$nExtreme, name="N extreme", width=unit(5,"mm")) +
   rowAnnotation(link = anno_mark(at = which(n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme)), 
                                  labels = n_hits_and_extreme[n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme),"gene_symbol"], 
                                  link_width = unit(2,"mm"),
-                                 labels_gp = gpar(fontsize = 5), padding = unit(1, "mm")))
+                                 labels_gp = gpar(fontsize = 5), padding = unit(2, "mm")))
 
 hms$female_model_01 <- hms$female_model_01 +
   #Heatmap(n_hits_and_extreme$nExtreme, name="N extreme", width=unit(5,"mm")) +
   rowAnnotation(link = anno_mark(at = which(n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme)), 
                                  labels = n_hits_and_extreme[n_hits_and_extreme$nExtreme > thresh*max(n_hits_and_extreme$nExtreme),"gene_symbol"], 
                                  link_width = unit(2,"mm"),
-                                 labels_gp = gpar(fontsize = 5), padding = unit(1, "mm")))
+                                 labels_gp = gpar(fontsize = 5), padding = unit(2, "mm")))
 
 
 

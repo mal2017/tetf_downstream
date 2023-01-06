@@ -25,16 +25,18 @@ pirna_gene_ids <- ifelse(exists("snakemake"),
     read_tsv()
 
 # import remap peaks as gr
-remap <- ifelse(exists("snakemake"),
+remap0 <- ifelse(exists("snakemake"),
     snakemake@input$remap,
     "results/resources/remap.gr.rds") %>%
     readRDS()
 
-remap <- remap[c("pan","CG16779","NfI")]
-
-remap <- remap %>%
+remap0 <- remap0 %>%
   unlist() %>%
   mutate(.,ChIP = names(.)) 
+
+remap <- remap0 %>%
+  filter(ChIP %in% c("pan","CG16779","NfI"))
+
 
 # get first bp of all genes so I can set upstream distances on the fly
 all_genes <- genes(txdb) %>% 
@@ -54,6 +56,7 @@ other_genes <- all_genes %>% filter(!gene_id %in% pirna_gene_ids$gene_ID)
 shared_seqs <- intersect(seqlevelsInUse(remap),seqlevelsInUse(pirna_genes))
 seqlevels(pirna_genes, pruning.mode="coarse") <- shared_seqs
 seqlevels(remap, pruning.mode="coarse") <- shared_seqs
+seqlevels(remap0, pruning.mode="coarse") <- shared_seqs
 
 
 get_cont_tbl <- function(d, fac, fix="end") {
@@ -76,15 +79,17 @@ res <- unique(remap$ChIP) %>%
 
 res <- res %>% mutate(padj = p.adjust(p.value, method="BH"))
 
-g <- all_genes %>% join_overlap_left_within(remap,maxgap=500) %>%
+g <- all_genes %>% 
+  join_overlap_left_within(remap0,maxgap=500) %>%
   as_tibble() %>%
   distinct() %>%
   group_by(gene_id) %>%
   summarise(n=sum(!is.na(ChIP))) %>%
   mutate(is.piRNA = gene_id %in% pirna_gene_ids$gene_ID) %>%
-  ggplot(aes(is.piRNA,log10(n+1))) +
+  ggplot(aes(is.piRNA,n)) +
   geom_boxplot() +
-  ggpubr::stat_compare_means()
+  ggpubr::stat_compare_means() +
+  ylab("REMAP TFs bound to promoter")
   
 ggsave(snakemake@output[["png"]],g)
 saveRDS(g,snakemake@output[["rds"]])

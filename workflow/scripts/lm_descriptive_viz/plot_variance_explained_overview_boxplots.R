@@ -19,8 +19,7 @@ dat <- dat %>%
 
 g <-  dat %>% ggplot(aes(coef,var.explained,fill=model)) +
   geom_boxplot() +
-  scale_y_log10()
-
+  ylab("% explained variance")
 
 saveRDS(g,snakemake@output[["rds"]])
 ggsave(snakemake@output[["png"]],g)

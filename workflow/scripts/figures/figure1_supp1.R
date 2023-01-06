@@ -32,7 +32,13 @@ filtering_barplot <- filtering_barplot + theme(legend.position = c(0.95,1.05), l
 
 alluvial <- alluvial + guides(fill="none")
 
-coex_te_hist <- coex_te_hist + facet_wrap(~model)
+coex_te_hist <- coex_te_hist + facet_wrap(~model) + xlab("coexpression score")
+
+var_exp_box <- var_exp_box + theme(axis.text.x = element_text(angle=45, hjust=1))
+
+mf_corr$estimate.qnorm <- mf_corr$estimate.qnorm + 
+  xlab("male coexpression score") + ylab("female coexpression score")
+  #ylim(c(-0.5, 0.5)) + xlim(c(-0.5,0.5)) 
 
 if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
 
@@ -44,13 +50,11 @@ pb <- plotGG(plot = alluvial, x = 3.25, y=0.05, just = c("left","top"),width = 4
 
 pc <- plotGG(plot = var_exp_box, x = 0.25,  y=2.25, just = c("left","top"),width = 2.75, height=2)
 
-pd <- plotGG(plot = consistency, x = 3.25,  y=2.25, just = c("left","top"),width = 4.125, height=2)
+pd <- plotGG(plot = coex_te_hist, x = 3.25,  y=2.25, just = c("left","top"),width = 4.125, height=2)
 
-pe <- plotGG(plot = coex_te_hist, x = 0.25,  y=4.5, just = c("left","top"),width = 4.125, height=2)
+pe <- plotGG(plot = mf_corr$estimate.qnorm, x = 0.25,  y=4.3, just = c("left","top"),width = 2.7, height=2.7)
 
-pf <- plotGG(plot = mf_corr$estimate.qnorm, x = 4.375,  y=4.5, just = c("left","top"),width = 3, height=2)
-
-pg <- plotGG(plot = sex_specific_bar, x = 0.25,  y=6.75, just = c("left","top"),width = 3, height=2)
+pf <- plotGG(plot = sex_specific_bar, x = 4.375-1.25,  y=4.5, just = c("left","top"),width = 4.25, height=2)
 
 plotText(label = "A", fontsize = 7,
          x = 0.25, y = 0.25, just = "center", default.units = "inches")
@@ -68,11 +72,7 @@ plotText(label = "E", fontsize = 7,
          x = 0.25, y = 4.5, just = "center", default.units = "inches")
 
 plotText(label = "F", fontsize = 7,
-         x = 4.5, y = 4.5, just = "center", default.units = "inches")
-
-plotText(label = "G", fontsize = 7,
-         x = 0.25, y = 6.75, just = "center", default.units = "inches")
-
+         x = 4.5-1.25, y = 4.5, just = "center", default.units = "inches")
 
 plotText(label = "Figure 1 - Supplement 1", fontsize = 12,
          x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")

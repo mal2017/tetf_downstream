@@ -92,7 +92,7 @@ rule figure4_supp1:
   input:
     pirna_slaidina = rules.plot_pirna_gene_expression_slaidina.output.rds,
     our_kds_all = rules.plot_pirna_genes_in_our_kd_all.output.rds,
-    motifs = rules.compare_hmg_motifs_from_archbold14.output.motif_comparison,
+    motifs = rules.plot_combined_motif_analysis_table.output.rda,
   output:
     pdf = "results/figures/figure4_supp1.pdf"
   script:
