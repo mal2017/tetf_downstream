@@ -93,7 +93,7 @@ rule figure4_supptable:
   input:
     proximity = rules.remap_peaks_near_pirna_genes_contingency.output.kd_chip_intersect_rds,
   output:
-    pdf = "results/figures/figure4_supp1.pdf"
+    pdf = "results/figures/figure4_supptable.pdf"
   script:
     "../scripts/figures/figure4_supptable.R"
 
