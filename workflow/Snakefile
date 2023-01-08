@@ -17,6 +17,7 @@ rule all:
   input:
     rules.collect_stats.output.json,
     rules.figures.output,
+    rules.local_r_info.output,
 
 
   

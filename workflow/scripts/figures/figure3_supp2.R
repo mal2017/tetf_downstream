@@ -8,6 +8,10 @@ our_kd_box_coefs <- ifelse(exists("snakemake"),snakemake@input[["kd_gene_coefs_b
                            "results/plots/kd_gene_coefs_boxplot.rds") %>%
   read_rds()
 
+volcs <- ifelse(exists("snakemake"),snakemake@input[["volcs"]],
+                    "results/plots/this_study_kd_deseq2.rds") %>%
+  read_rds()
+
 waterfall <- ifelse(exists("snakemake"),snakemake@input[["waterfall"]],
                               "results/plots/s2rplus_lfc_waterfall.rds") %>%
   read_rds()
@@ -15,16 +19,18 @@ waterfall <- ifelse(exists("snakemake"),snakemake@input[["waterfall"]],
 
 # edits ---------------
 
-waterfall <- waterfall + xlab("mean TE LFC rank")
+waterfall <- waterfall + xlab("RNAi targets ranked by mean TE LFC")
 
 
-if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
+if (!interactive()) pdf(snakemake@output[["pdf"]],width = 8.5, height = 11)
 
-pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = interactive())
+pageCreate(width = 8.5, height = 11, default.units = "inches", showGuides = interactive())
 
 pa <- plotGG(plot = our_kd_box_coefs, x = 0.25, y=0.05, just = c("left","top"),width = 7.25, height=2)
 
-pb <- plotGG(plot = waterfall, x = 0.25, y=2.25, just = c("left","top"),width = 6.75, height=2)
+pb <- plotGG(plot = volcs, x = 0.25, y=2.25, just = c("left","top"),width = 7.75, height=6)
+
+pc <- plotGG(plot = waterfall, x = 0.25, y=8.5, just = c("left","top"),width = 6.75, height=2)
 
 
 plotText(label = "A", fontsize = 7,
@@ -33,8 +39,11 @@ plotText(label = "A", fontsize = 7,
 plotText(label = "B", fontsize = 7,
          x = 0.25, y = 2.25, just = c("center"), default.units = "inches")
 
+plotText(label = "C", fontsize = 7,
+         x = 0.25, y = 8.5, just = c("center"), default.units = "inches")
+
 
 plotText(label = "Figure 3 - Supplement 2", fontsize = 12,
-         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
+         x = 0.1, y = 10.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()

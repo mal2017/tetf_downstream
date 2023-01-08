@@ -25,6 +25,14 @@ rule our_kd_stats:
     script:
         "../scripts/stats/our_kd_stats.R"
 
+rule our_kd_signatures_stats:
+    input:
+        gsea_tbl = rules.ourKD_gsea.output.rds,
+    output:
+        json = "results/stats/our_kd_signatures_stats.json"
+    script:
+        "../scripts/stats/our_kd_signatures_stats.R"
+
 
 rule collect_stats:
     """
@@ -35,6 +43,8 @@ rule collect_stats:
         rules.plot_pirna_genes_in_lms.output.json,
         rules.s2rplus_stats.output.json,
         rules.our_kd_stats.output.json,
+        rules.our_kd_signatures_stats.output.json,
+        rules.remap_peaks_near_pirna_genes_contingency.output.json,
     output:
         json = touch("results/stats/collected_stats.json")
     conda:

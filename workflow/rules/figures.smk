@@ -73,6 +73,7 @@ rule figure3_supp2:
   input:
     kd_gene_coefs_box = rules.plot_kd_gene_coefs_boxplot.output.rds,
     waterfall = rules.plot_s2rplus_lfc_waterfall.output.rds,
+    volcs = rules.plot_this_study_kd_deseq2.output.rds,
   output:
     pdf = "results/figures/figure3_supp2.pdf"
   script:
@@ -88,15 +89,32 @@ rule figure4:
   script:
     "../scripts/figures/figure4.R"
 
+rule figure4_supptable:
+  input:
+    proximity = rules.remap_peaks_near_pirna_genes_contingency.output.kd_chip_intersect_rds,
+  output:
+    pdf = "results/figures/figure4_supp1.pdf"
+  script:
+    "../scripts/figures/figure4_supptable.R"
+
 rule figure4_supp1:
   input:
-    pirna_slaidina = rules.plot_pirna_gene_expression_slaidina.output.rds,
     our_kds_all = rules.plot_pirna_genes_in_our_kd_all.output.rds,
+    pirna_slaidina = rules.plot_pirna_gene_expression_slaidina.output.rds,
     motifs = rules.plot_combined_motif_analysis_table.output.rda,
   output:
     pdf = "results/figures/figure4_supp1.pdf"
   script:
     "../scripts/figures/figure4_supp1.R"
+
+
+rule local_r_info:
+  output:
+    package_info = "results/figures/local_r_pkgs.tsv",
+    platform_info = "results/figures/local_r_platform.tsv",
+    external_session_info = "results/figures/local_r_external.tsv"
+  script:
+    "../scripts/figures/local_r_pkgs.R"
 
 rule figures:
   input:
@@ -110,6 +128,7 @@ rule figures:
     rules.figure3_supp2.output.pdf,
     rules.figure4.output.pdf,
     rules.figure4_supp1.output.pdf,
+    rules.figure4_supptable.output.pdf,
   output:
     "results/figures/all_figures.pdf"
   shell:

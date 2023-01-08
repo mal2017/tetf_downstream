@@ -12,12 +12,11 @@ res <- ifelse(exists("snakemake"), snakemake@input[["res"]],
 
 
 oi <-rev(c("knockdown2_pan_female_gonad_tj_control_female_gonad_tj","knockdown2_CG16779_female_gonad_tj_control_female_gonad_tj",
-        "knockdown2_CG16779_female_head_Mef2.R_control_female_head_Mef2.R","knockdown2_NFI_female_head_Mef2.R_control_female_head_Mef2.R"))
+        "knockdown2_CG16779_female_gonad_tj_control_female_gonad_tj","knockdown2_NFI_female_head_Mef2.R_control_female_head_Mef2.R"))
 
 res2 <- res$adjusted %>% 
   map_df(as_tibble, .id="RNAi") %>% 
   filter(RNAi %in% oi) %>%
-  mutate(RNAi = fct_relevel(RNAi,oi)) %>%
   mutate(RNAi= str_remove(RNAi,"knockdown2_")) %>%
   relocate(RNAi,feature)
 

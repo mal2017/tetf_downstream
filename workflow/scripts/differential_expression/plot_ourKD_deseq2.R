@@ -48,6 +48,7 @@ plot_volc <- function(x,y) {
     ggtitle(y)
 }
 
+gg <- (res %>% plot_volc("")) + facet_wrap(~label)
 
 gg_tbl <- res %>% 
   nest(data=-c(feature.x,tissue,driver,label)) %>%
@@ -57,7 +58,7 @@ gg_tbl <- res %>%
 gg_list <- gg_tbl %>% dplyr::select(label,gg) %>%
   deframe()
 
-write_rds(gg_list,snakemake@output[["rds"]])
+write_rds(gg,snakemake@output[["rds"]])
 
 library(patchwork)
 g <- (gg_list %>% Reduce(`+`,.)) + plot_layout(guides = "collect") & theme(legend.position = "bottom")

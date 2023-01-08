@@ -6,6 +6,16 @@ library(rtracklayer)
 library(AnnotationDbi)
 library(furrr)
 
+deg <- ifelse(exists("snakemake"),snakemake@input[["deseq_gr"]],
+              "results/analysis/deg/ourKD.de.grs.rds") %>%
+                read_rds() %>%
+  .$adjusted %>%
+  map_df(as_tibble,.id="RNAi")  %>%
+  mutate(feature.x = str_extract(RNAi,"NFI|CG16779")) %>%
+  mutate(feature.x=if_else(feature.x == "NFI","NfI",feature.x)) %>%
+  filter(padj < 0.1) %>%
+  filter(!is.na(feature.x))
+
 # import saved txdb
 threads <- ifelse(exists("snakemake"),
                snakemake@threads,4)
@@ -79,6 +89,14 @@ res <- unique(remap$ChIP) %>%
 
 res <- res %>% mutate(padj = p.adjust(p.value, method="BH"))
 
+res %>%
+  dplyr::select(ChIP,d,method,padj) %>%
+  pivot_wider(names_from = c("ChIP","d"), values_from = "padj") %>%
+  mutate(model="all", stat_group="peak_to_pirna_gene_prox") %>%
+  nest(-model, -stat_group) %>%
+  jsonlite::write_json(snakemake@output$json, prettify=T)
+  
+
 g <- all_genes %>% 
   join_overlap_left_within(remap0,maxgap=500) %>%
   as_tibble() %>%
@@ -115,6 +133,24 @@ pirna_genes %>%
   relocate(gene_symbol) %>% filter(!pan & (NfI | CG16779)) %>%
   print(n=Inf) %>%
   filter(gene_symbol %in% poi)
+
+
+# now find differentially expressed pirna genes nearby those peaks
+pirna_genes %>%
+  {x <- .; x@elementMetadata$distance <- NULL; x} %>%
+  join_overlap_left(remap, maxgap=1000) %>%
+  #filter(distance == 0) %>%
+  as_tibble() %>%
+  inner_join(deg, by=c(ChIP="feature.x", gene_id="feature")) %>% 
+  left_join(pirna_gene_ids, by=c(gene_id="gene_ID")) %>%
+  mutate(tissue = str_extract(RNAi,"male_gonad|female_head|female_gonad")) %>%
+  dplyr::select(`ChIP/RNAi`=ChIP,tissue,gene_symbol,log2FoldChange, padj) %>%
+  distinct() %>%
+  arrange(`ChIP/RNAi`, tissue, -log2FoldChange) %>%
+  #print(n=Inf)
+  saveRDS(snakemake@output[["kd_chip_intersect_rds"]])
+  
+
 
 # ------------------------------------------------------------------------------
 # approach Fishers 2

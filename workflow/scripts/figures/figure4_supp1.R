@@ -8,7 +8,7 @@ our_kds <- ifelse(exists("snakemake"),snakemake@input[["our_kds_all"]],"results/
   read_rds()
 
 rda <- ifelse(exists("snakemake"), snakemake@input[["motifs"]],
-                   "results/plots/combined_motif_analysis_table.rda")
+              "results/plots/combined_motif_analysis_table.rda")
 load(rda)
 
 slaidina <- ifelse(exists("snakemake"), snakemake@input[["pirna_slaidina"]],
@@ -54,7 +54,6 @@ plotText(label = "Figure 4 - Supplement 1", fontsize = 12,
          x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()
-
 
 
 

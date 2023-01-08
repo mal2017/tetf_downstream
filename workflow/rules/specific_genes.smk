@@ -56,10 +56,13 @@ rule remap_peaks_near_pirna_genes_contingency:
         pirna = rules.make_pirna_gene_list.output.tsv,
         remap = rules.annotate_fixed_insertions.output.remap,
         txdb = rules.make_txdb.output.txdb,
+        deseq_gr = rules.this_study_kd_deseq2.output.grs,
     output:
         res_rds = "results/analysis/specific_genes/remap_peaks_near_pirna_genes_contingency.rds",
         rds = "results/plots/remap_peaks_near_pirna_genes_contingency.pirna-more-regulated.rds",
         png = "results/plots/remap_peaks_near_pirna_genes_contingency.pirna-more-regulated.png",
+        kd_chip_intersect_rds = "results/analysis/specific_genes/remap_peaks_near_pirna_genes_contingency.kd-chip-intersect.rds",
+        json = "results/stats/remap_peaks_near_pirna_genes_contingency.json",
     threads:
         4
     script:
