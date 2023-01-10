@@ -58,6 +58,11 @@ significant_term_pct <- bind_rows(dat %>% get_pct_sig(),
 # ------------------------------------------------------------------------------
 # N
 # ------------------------------------------------------------------------------
+significant_models <- dat %>% 
+  filter(significant_model) %>% 
+  dplyr::select(feature.x,feature.y) %>%
+  distinct()
+
 # calculate the total number of unique feature.y entries
 dat %>% dplyr::select(feature.y) %>%
   distinct() %>%
@@ -69,6 +74,16 @@ dat %>% dplyr::select(feature.x) %>%
   distinct() %>%
   nrow() %>%
   list(n_features.x_tested =.)-> n_features.x
+
+#
+n_valid_nonrepro <- dat %>% 
+  filter(valid & !reproducible) %>%
+  dplyr::anti_join(significant_models) %>%
+  dplyr::select(feature.x, feature.y) %>%
+  distinct() %>%
+  nrow() %>%
+  list(n_valid_nonrepro= .)
+  
 
 # Calculate total number of unique pairs assessed
 dat %>% dplyr::select(feature.x, feature.y) %>%
@@ -85,7 +100,7 @@ n_retained <- dat %>% filter(significant_model) %>%
 n_removed <- (n_pairs$n_total_pairs_tested - n_retained$n_retained) %>%
   list(n_removed = .)
 
-basic_n <- c(n_features.y, n_features.x, n_pairs, n_removed, n_retained) %>% 
+basic_n <- c(n_features.y, n_features.x, n_pairs, n_removed, n_retained, n_valid_nonrepro) %>% 
   enframe(name="statistic") %>%
   mutate(model = "all",
          stat_group = "basic_n") %>%
