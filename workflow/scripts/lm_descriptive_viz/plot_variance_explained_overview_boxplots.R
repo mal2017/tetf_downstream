@@ -13,12 +13,14 @@ dat <- mods %>%
   pivot_longer(contains("sumsq"), names_to = "coef", values_to = "var.explained") %>%
   mutate(coef = str_remove(coef,"sumsq_anova_"))
 
+dat <- dat %>% mutate(coef = ifelse(coef == "x", "gene expression", coef))
+
 dat <- dat %>% 
   mutate(coef = fct_reorder(coef,var.explained,.fun = function(.x) {mean(.x,na.rm=T)})) %>%
   mutate(var.explained = var.explained + 1)
 
 g <-  dat %>% ggplot(aes(coef,var.explained,fill=model)) +
-  geom_boxplot() +
+  geom_boxplot(outlier.size = 0.01) +
   ylab("% explained variance")
 
 saveRDS(g,snakemake@output[["rds"]])

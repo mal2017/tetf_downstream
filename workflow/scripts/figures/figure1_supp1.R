@@ -42,6 +42,8 @@ mf_corr$estimate.qnorm <- mf_corr$estimate.qnorm +
   xlab("male coexpression score") + ylab("female coexpression score")
   #ylim(c(-0.5, 0.5)) + xlim(c(-0.5,0.5)) 
 
+alluvial <- alluvial + theme(axis.text.x = element_text(angle=45, hjust=1))
+
 if (!interactive()) pdf(snakemake@output[["pdf"]],width = 7.5, height = 10)
 
 pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = interactive())

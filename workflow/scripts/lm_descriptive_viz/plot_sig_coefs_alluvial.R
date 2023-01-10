@@ -21,8 +21,13 @@ dat2 <- dat %>%
   mutate(combo = row_number()) %>%
   pivot_longer(-c(n,combo,model))
 
+dat2 <- dat2 %>% mutate(name = ifelse(name == "x", "gene expression", name))
+
 dat2 <- dat2 %>%
-  mutate(name=fct_relevel(name,c("overlap","wolbachia","scaled.copies.y","x")))
+  mutate(name=fct_relevel(name,c("overlap","wolbachia","scaled.copies.y","gene expression")))
+
+
+
 
 g <- ggplot(dat2,
        aes(x=name,stratum=value,alluvium=combo,y = n,label=value,fill=value)) +
