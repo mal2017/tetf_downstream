@@ -2,6 +2,8 @@ library(plotgardener)
 library(tidyverse)
 library(patchwork)
 
+fig_desc <- ifelse(exists("snakemake"),snakemake@params$plot_title,"Figure 2")
+
 theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = element_text(hjust = 0.5)))
 
 pirna_box <- ifelse(exists("snakemake"),snakemake@input[["pirna_box"]],"results/plots/pirna_genes_in_lms.rds") %>%
@@ -27,7 +29,7 @@ plotText(label = "A", fontsize = 7,
 plotText(label = "B", fontsize = 7,
          x = 5.125, y = 0.25, just = "center", default.units = "inches")
 
-plotText(label = "Figure 2", fontsize = 12,
+plotText(label = fig_desc, fontsize = 12,
          x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()

@@ -3,6 +3,8 @@ library(tidyverse)
 library(patchwork)
 library(gt)
 
+fig_desc <- ifelse(exists("snakemake"),snakemake@params$plot_title,"Figure2 - Supplement 1")
+
 theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = element_text(hjust = 0.5)))
 
 gg_gsea_table <- ifelse(exists("snakemake"),snakemake@input[["gg_gsea_table"]],"results/plots/gene_group_gsea.table.png")
@@ -27,8 +29,8 @@ pb <- plotGG(plot = gtg, x = 0.25, y=0.5, just = c("left","top"),width = 7.25, h
 #plotText(label = "B", fontsize = 7,
 #         x = 0.75, y = 2.5, just = "center", default.units = "inches")
 
-#plotText(label = "Figure 2 - Supplement 1", fontsize = 12,
-#         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
+plotText(label = fig_desc, fontsize = 12,
+         x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()
 

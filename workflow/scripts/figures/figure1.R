@@ -4,6 +4,8 @@ library(png)
 library(ComplexHeatmap)
 library(patchwork)
 
+fig_desc <- ifelse(exists("snakemake"),snakemake@params$plot_title,"Figure 1")
+
 theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = element_text(hjust = 0.5)))
 
 cartoon_01 <- ifelse(exists("snakemake"),snakemake@input[["cartoon"]],"resources//simple_linmod_methods_v01.png") %>%
@@ -49,7 +51,7 @@ plotText(label = "C", fontsize = 7,
 plotText(label = "D", fontsize = 7,
          x = 0.25, y = 1.625, just = "center", default.units = "inches")
 
-plotText(label = "Figure 1", fontsize = 12,
+plotText(label = fig_desc, fontsize = 12,
          x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()

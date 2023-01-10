@@ -5,6 +5,8 @@ library(gt)
 library(gtExtras)
 library(gridExtra)
 
+fig_desc <- ifelse(exists("snakemake"),snakemake@params$plot_title,"Figure 4")
+
 theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = element_text(hjust = 0.5)))
 
 our_kds <- ifelse(exists("snakemake"),snakemake@input[["our_kds"]],"results/plots/pirna_genes_in_our_kd.rds") %>%
@@ -50,7 +52,7 @@ plotText(label = "B", fontsize = 7,
 plotText(label = "C", fontsize = 7,
          x = 3.25, y = 2.25, just = "center", default.units = "inches")
 
-plotText(label = "Figure 4", fontsize = 12,
+plotText(label = fig_desc, fontsize = 12,
          x = 0.1, y = 10.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()

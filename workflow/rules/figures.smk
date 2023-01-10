@@ -5,6 +5,8 @@ rule figure1:
     ncoex_scatter=rules.plot_intro_ncoex_scatter.output.rds
   output:
     pdf = "results/figures/figure1.pdf"
+  params:
+    plot_title= "Figure 1"
   script:
     "../scripts/figures/figure1.R"
 
@@ -19,6 +21,8 @@ rule figure1_supp1:
     consistency = rules.plot_consistency.output.rds,
   output:
     pdf = "results/figures/figure1_supp1.pdf"
+  params:
+    plot_title= "Supplementary Figure 1 (related to Figure 1)"
   script:
     "../scripts/figures/figure1_supp1.R"
 
@@ -29,6 +33,8 @@ rule figure2:
     gg_gsea_volc = rules.plot_gene_group_gsea_volc.output.rds,
   output:
     pdf = "results/figures/figure2.pdf"
+  params:
+    plot_title= "Figure 2"
   script:
     "../scripts/figures/figure2.R"
 
@@ -38,15 +44,19 @@ rule figure2_supp1:
     gg_gsea_table = rules.plot_gene_group_gsea_table.output.png,
   output:
     pdf = "results/figures/figure2_supp1.pdf"
+  params:
+    plot_title= "Supplementary Figure 2 (related to Figure 2)"
   script:
     "../scripts/figures/figure2_supp1.R"
 
 rule figure3:
   input:
     our_kds = rules.plot_ourKD_gsea.output.rds,
-    s2rnai = rules.plot_tfrnai_gsea.output.rds,
+    #s2rnai = rules.plot_tfrnai_gsea.output.rds,
   output:
     pdf = "results/figures/figure3.pdf"
+  params:
+    plot_title= "Figure 3"
   script:
     "../scripts/figures/figure3.R"
 
@@ -57,7 +67,9 @@ rule figure3_supp1:
   input:
     exemplary_scatters = rules.plot_exemplary_scatters.output.rds,
   output:
-    pdf = "results/figures/figure1_supp2.pdf"
+    pdf = "results/figures/figure3_supp1.pdf"
+  params:
+    plot_title= "Supplementary Figure 3 (related to Figure 3)"
   script:
     "../scripts/figures/figure3_supp1.R"
 
@@ -66,16 +78,20 @@ rule figure3_supptable:
     kd_info = rules.plot_kd_info.output.rds,
   output:
     pdf = "results/figures/figure3_supptable.pdf"
+  params:
+    plot_title= "Supplementary Table 1 (related to Figure 3)"
   script:
     "../scripts/figures/figure3_supptable.R"
 
 rule figure3_supp2:
   input:
     kd_gene_coefs_box = rules.plot_kd_gene_coefs_boxplot.output.rds,
-    waterfall = rules.plot_s2rplus_lfc_waterfall.output.rds,
+    #waterfall = rules.plot_s2rplus_lfc_waterfall.output.rds,
     volcs = rules.plot_this_study_kd_deseq2.output.rds,
   output:
     pdf = "results/figures/figure3_supp2.pdf"
+  params:
+    plot_title= "Supplementary Figure 4 (related to Figure 3)"
   script:
     "../scripts/figures/figure3_supp2.R"
 
@@ -86,6 +102,8 @@ rule figure4:
     slaidina = rules.plot_pan_coex_te_expression_slaidina.output.rds,
   output:
     pdf = "results/figures/figure4.pdf"
+  params:
+    plot_title= "Figure 4"
   script:
     "../scripts/figures/figure4.R"
 
@@ -94,6 +112,8 @@ rule figure4_supptable:
     proximity = rules.remap_peaks_near_pirna_genes_contingency.output.kd_chip_intersect_rds,
   output:
     pdf = "results/figures/figure4_supptable.pdf"
+  params:
+    plot_title= "Supplementary Table 2 (related to Figure 4)"
   script:
     "../scripts/figures/figure4_supptable.R"
 
@@ -104,6 +124,8 @@ rule figure4_supp1:
     motifs = rules.plot_combined_motif_analysis_table.output.rda,
   output:
     pdf = "results/figures/figure4_supp1.pdf"
+  params:
+    plot_title= "Supplementary Figure 5 (related to Figure 4)"
   script:
     "../scripts/figures/figure4_supp1.R"
 
@@ -119,15 +141,17 @@ rule local_r_info:
 rule figures:
   input:
     rules.figure1.output.pdf,
-    rules.figure1_supp1.output.pdf,
     rules.figure2.output.pdf,
-    rules.figure2_supp1.output.pdf,
     rules.figure3.output.pdf,
-    rules.figure3_supptable.output.pdf,
+    rules.figure4.output.pdf,
+
+    rules.figure1_supp1.output.pdf,
+    rules.figure2_supp1.output.pdf,
     rules.figure3_supp1.output.pdf,
     rules.figure3_supp2.output.pdf,
-    rules.figure4.output.pdf,
-    rules.figure4_supp1.output.pdf,
+    rules.figure4_supp1.output.pdf,    
+    
+    rules.figure3_supptable.output.pdf,
     rules.figure4_supptable.output.pdf,
   output:
     "results/figures/all_figures.pdf"

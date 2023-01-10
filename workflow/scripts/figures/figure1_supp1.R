@@ -2,6 +2,8 @@ library(plotgardener)
 library(tidyverse)
 library(patchwork)
 
+fig_desc <- ifelse(exists("snakemake"),snakemake@params$plot_title,"Figure 1 - Supplement 1")
+
 theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = element_text(hjust = 0.5)))
 
 var_exp_box <- ifelse(exists("snakemake"),snakemake@input[["var_exp_box"]],"results/plots/variance_explained_overview_boxplot.rds") %>%
@@ -74,7 +76,7 @@ plotText(label = "E", fontsize = 7,
 plotText(label = "F", fontsize = 7,
          x = 4.5-1.25, y = 4.5, just = "center", default.units = "inches")
 
-plotText(label = "Figure 1 - Supplement 1", fontsize = 12,
+plotText(label = fig_desc, fontsize = 12,
          x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()

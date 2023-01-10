@@ -2,6 +2,8 @@ library(plotgardener)
 library(tidyverse)
 library(patchwork)
 
+fig_desc <- ifelse(exists("snakemake"),snakemake@params$plot_title,"Figure 4 - Supplement 1")
+
 theme_set(theme_classic() + theme(text = element_text(size=5),plot.title = element_text(hjust = 0.5)))
 
 our_kds <- ifelse(exists("snakemake"),snakemake@input[["our_kds_all"]],"results/plots/pirna_genes_in_our_kd_all.rds") %>%
@@ -50,7 +52,7 @@ plotText(label = "B", fontsize = 7,
 plotText(label = "C", fontsize = 7,
          x = 3.125, y = 4.625, just = "center", default.units = "inches")
 
-plotText(label = "Figure 4 - Supplement 1", fontsize = 12,
+plotText(label = fig_desc, fontsize = 12,
          x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
 
 if (!interactive()) dev.off()

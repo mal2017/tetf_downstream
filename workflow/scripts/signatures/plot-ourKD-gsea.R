@@ -62,7 +62,7 @@ gs <- to_plot %>%
   #left_join(tissue) %>%
   mutate(label=paste0("UAS::",driver," ",kd,"-RNAi (",tissue,")")) %>%
   mutate(significance = ifelse(p.adjust < 0.1,"sig.","n.s.")) %>%
-  ggplot(aes(x,runningScore.nes,color=label)) +
+  ggplot(aes(x,runningScore.nes)) +
   geom_path(size=rel(1.1)) +
   geom_hline(yintercept = 0, linetype="dashed") +
   #ggrepel::geom_text_repel(max.overlaps = 10, max.iter = 100,color="black",fontface="italic",force_pull = 0.1,
