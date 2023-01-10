@@ -6,6 +6,14 @@ rule stats_descriptive_lms:
     script:
         "../scripts/stats/descriptive_lms.R"
 
+rule stats_pan_nfi_cg16779_vs_all:
+    input:
+        mods = config.get("MERGED_MODELS"),
+    output:
+        json = "results/stats/pan_nfi_cg16779_vs_all.json"
+    script:
+        "../scripts/stats/pan_nfi_cg16779_vs_all.R"
+
 rule s2rplus_stats:
     input:
         mods = config.get("MERGED_MODELS"),
@@ -45,6 +53,7 @@ rule collect_stats:
         rules.our_kd_stats.output.json,
         rules.our_kd_signatures_stats.output.json,
         rules.remap_peaks_near_pirna_genes_contingency.output.json,
+        rules.stats_pan_nfi_cg16779_vs_all.output.json,
     output:
         json = touch("results/stats/collected_stats.json")
     conda:
