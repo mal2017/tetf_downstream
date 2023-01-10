@@ -12,7 +12,8 @@ res <- ifelse(exists("snakemake"), snakemake@input[["res"]],
 
 
 oi <-rev(c("knockdown2_pan_female_gonad_tj_control_female_gonad_tj","knockdown2_CG16779_female_gonad_tj_control_female_gonad_tj",
-        "knockdown2_CG16779_female_gonad_tj_control_female_gonad_tj","knockdown2_NFI_female_head_Mef2.R_control_female_head_Mef2.R"))
+        "knockdown2_CG16779_female_gonad_tj_control_female_gonad_tj","knockdown2_NFI_female_head_Mef2.R_control_female_head_Mef2.R",
+        "knockdown2_CG16779_male_gonad_aTub_control_male_gonad_aTub"))
 
 res2 <- res$adjusted %>% 
   map_df(as_tibble, .id="RNAi") %>% 
