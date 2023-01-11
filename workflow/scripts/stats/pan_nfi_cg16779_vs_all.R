@@ -19,9 +19,25 @@ res <- sig_pairs %>%
   mutate(across(contains("estimate.qnorm"), .f=list(cume_dist=cume_dist), .names = "{.col}_{.fn}"),.keep = "all",) %>%
   ungroup()
 
-res  %>% 
+res_long <- res %>% pivot_longer(-c(model, gene_symbol), names_to = "metric", values_to = "value")
+
+res_with_cutoff <- res  %>% 
+  filter(gene_symbol %in% c("pan","NfI","CG16779")) %>%
+  dplyr::select(model, gene_symbol, contains("cume_dist")) %>%
+  pivot_longer(-c(model, gene_symbol), names_to = "metric", values_to = "cutoff") %>%
+  left_join(res_long, by = c("model","metric"),suffix=c(".cutoff",".target"))
+
+res_n_better <- res_with_cutoff %>% 
+  filter(value > cutoff) %>%
+  count(model, gene_symbol.cutoff, metric) %>%
+  mutate(stat_group = "n_better_than") %>%
+  nest(-model, -stat_group)
+
+res_pctile <- res  %>% 
   filter(gene_symbol %in% c("pan","NfI","CG16779")) %>%
   arrange(gene_symbol) %>%
   mutate(stat_group = "relative_rank_genes_of_interest") %>%
-  nest(-model, -stat_group) %>%
-  write_json(snakemake@output$json, prettify=T)
+  nest(-model, -stat_group) 
+
+
+write_json(bind_rows(res_n_better, res_pctile), snakemake@output$json, prettify=T)
