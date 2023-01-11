@@ -39,9 +39,9 @@ pageCreate(width = 7.5, height = 10, default.units = "inches", showGuides = inte
 
 pa <- plotGG(plot = our_kds, x = 0.05, y=0.05, just = c("left","top"),width = 7, height=4)
 
-pb <- plotGG(plot = slaidina, x = 0.15, y=4.5, just = c("left","top"),width = 2.65, height=4)
+#pb <- plotGG(plot = slaidina, x = 0.15, y=4.5, just = c("left","top"),width = 2.65, height=4)
 
-pc <- plotGG(plot=motif_alns, x = 3.15, y=4.5, just = c("left","top"),width = 4.15, height=4)
+pc <- plotGG(plot=motif_alns, x = 0.15, y=4.5, just = c("left","top"),width = 7, height=4)
 
 plotText(label = "A", fontsize = 7,
          x = 0.125, y = 0.125, just = "center", default.units = "inches")
@@ -49,8 +49,8 @@ plotText(label = "A", fontsize = 7,
 plotText(label = "B", fontsize = 7,
          x = 0.125, y = 4.625, just = "center", default.units = "inches")
 
-plotText(label = "C", fontsize = 7,
-         x = 3.125, y = 4.625, just = "center", default.units = "inches")
+#plotText(label = "C", fontsize = 7,
+#         x = 3.125, y = 4.625, just = "center", default.units = "inches")
 
 plotText(label = fig_desc, fontsize = 12,
          x = 0.1, y = 9.9, just = c("left","bottom"), default.units = "inches")
