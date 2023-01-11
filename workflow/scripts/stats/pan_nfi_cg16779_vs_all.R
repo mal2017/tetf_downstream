@@ -29,8 +29,11 @@ res_with_cutoff <- res  %>%
 
 res_n_better <- res_with_cutoff %>% 
   filter(value > cutoff) %>%
+  dplyr::select(-model) %>%
+  distinct() %>%
   count(model, gene_symbol.cutoff, metric) %>%
   mutate(stat_group = "n_better_than") %>%
+  mutate(model = "combined") %>%
   nest(-model, -stat_group)
 
 res_pctile <- res  %>% 
