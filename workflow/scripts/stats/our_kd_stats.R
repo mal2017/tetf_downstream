@@ -17,5 +17,6 @@ to_write_json <- dat$data %>%
   tibble(model=NA, stat_group="sig_pirna_our_kd", .) %>%
   nest(-model,-stat_group)
 
+
 write_json(to_write_json, snakemake@output$json, pretty=T)
 

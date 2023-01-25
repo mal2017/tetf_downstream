@@ -100,6 +100,43 @@ g_cts <- toplot_cts %>%
 
 g <- g_var + g_est + g_cts + plot_layout(guides="collect")
 
+g1 <- toplot_cts %>%
+  filter(model=="female") %>%
+  mutate(name =as.character(name)) %>%
+  mutate(name=ifelse(name=="other",name,"piRNA")) %>%
+  ggplot(aes(name,sig)) +
+  geom_boxplot(outlier.shape = NA) +
+  ggpubr::stat_compare_means(label.y=12) +
+  xlab("gene set") +
+  ylab("coexpressed TEs") +
+  coord_cartesian(ylim = c(0,15))
+
+
+g2 <- toplot_continuous %>%
+  filter(model=="female") %>%
+  mutate(name =as.character(name)) %>%
+  mutate(name=ifelse(name=="other",name,"piRNA")) %>%
+  ggplot(aes(name,pct.var.expl)) +
+  geom_boxplot(outlier.shape = NA) +
+  ggpubr::stat_compare_means(label.y=0.015) +
+  xlab("gene set") +
+  ylab("variance explained") +
+  scale_y_continuous(labels = scales::percent) +
+  coord_cartesian(ylim = c(0,0.02))
+
+g3 <- toplot_continuous %>%
+  filter(model=="female") %>%
+  mutate(name =as.character(name)) %>%
+  mutate(name=ifelse(name=="other",name,"piRNA")) %>%
+  ggplot(aes(name,abs(estimate.qnorm))) +
+  geom_boxplot(outlier.shape=NA) +
+  ggpubr::stat_compare_means(label.y=0.2) +
+  coord_cartesian(ylim = c(0,0.25)) +
+  xlab("gene set") +
+  ylab("coexpression score")
+
+ g1 + g2 + g3 & plot_layout(guides="collect") & theme_classic()
+
 # # ------------------------------------------------------------------------------
 # # do we find anything special abt piRNA pathway genes in terms of number of assoc?
 # # the total number of reproducible TE associations is higher for piRNA genes

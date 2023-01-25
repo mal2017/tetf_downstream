@@ -77,6 +77,12 @@ get_cont_tbl <- function(d, fac, fix="end") {
     matrix(nrow=2,dimnames = list(c("piRNA","other"),c("bound","unbound")), byrow = F)
 }
 
+# sanity check for my matrix population/dimnaming:
+# c(1,2,3,4) %>% matrix(nrow=2, byrow=F, dimnames=list(c("A","B"),c("C","D")))
+
+# sanity check for the actual number
+#subsetByOverlaps(resize(pirna_genes, 1000, fix="end"), plyranges::filter(remap,ChIP=="NfI"))
+
 d <- c(500,1000, 2500, 5000, 10000, 25000)
 # for all chips, see if they're enriched
 res <- unique(remap$ChIP) %>%

@@ -13,10 +13,18 @@ plot_mat <- function(x,y) {
     ggtitle(y)
   }
 
+plot_box <-  function(x, y) {
+  x %>% 
+  ggplot(aes_string(x="data_subset",y=colnames(x)[3])) +
+    geom_boxplot() +
+    ggpubr::stat_compare_means()
+}
+
 rew <- rew %>%
   filter(padj < 0.1) %>%
   mutate(title = paste(gene_symbol,feature.y,nearby_gene,sep=">")) %>%
-  mutate(gg=map2(data,title,plot_mat))
+  mutate(gg=map2(data,title,plot_mat),
+         gg2 = map2(data, title, plot_box))
 
 
 oi <- rew %>%
@@ -27,10 +35,16 @@ oi <- rew %>%
   #filter(feature.y == "diver2") %>%
   #head(10) %>%
 
+theme_set(theme_classic())
+oi %>% 
+  pull(gg) %>% .[[2]] +
+  xlab("Hr39 expression") +
+  ylab("Cyp6a2 expression") +
+  facet_wrap(~data_subset)
 
-oi %>% pull(gg) %>% rev()
-.[[1]]
-
+  filter(oi, nearby_gene %in% c("FBgn0037140","FBgn0260397","FBgn0032615","FBgn0284237","FBgn0262509",
+                                "FBgn0052226")) %>%
+    pull(gg)
 
 ggplot(filter(rew,padj < 0.1 & sign(rho_focus_strains)!=sign(rho_other_strains)),aes(rho_focus_strains,rho_other_strains,size=-log10(p.value),label=paste(gene_symbol,feature.y,nearby_gene))) + geom_label()
 
