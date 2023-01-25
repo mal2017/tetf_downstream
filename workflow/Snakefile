@@ -1,6 +1,7 @@
 configfile: "config/config.yaml"
 
 include: "rules/make_resources.smk"
+include: "rules/independent_dataset.smk"
 include: "rules/differential_expression.smk"
 include: "rules/signatures.smk"
 include: "rules/direct_binding.smk"

@@ -5,6 +5,7 @@ COFACS: resources/Drosophila_melanogaster_TF_cofactors.txt
 TE_FA: resources/Tidalbase_transposon_sequence.fasta
 S2_CHROMSTATE: resources/chromstate_s2_9state_r5todm6.bed.gz
 MERGED_MODELS: upstream/final-models.collected-info.tsv.gz
+INDEPENDENT_DATASET: upstream/final-models.collected-info.reps.tsv.gz
 THIS_STUDY_RNAI: upstream/kd.se.gene.0.rds
 THIS_STUDY_DGRP_RNA: upstream/se.gene.0.rds
 DGRP_TIDAL: upstream/DGRP_flies.tsv.gz

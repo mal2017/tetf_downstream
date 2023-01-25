@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # Read in data
-mods <- ifelse(exists("snakmeake"), 
+mods <- ifelse(exists("snakemake"), 
     snakemake@input$mods, 
     "upstream/final-models.collected-info.tsv.gz") %>%
     read_tsv()
