@@ -2,6 +2,7 @@ configfile: "config/config.yaml"
 
 include: "rules/make_resources.smk"
 include: "rules/independent_dataset.smk"
+include: "rules/enrichment.smk"
 include: "rules/differential_expression.smk"
 include: "rules/signatures.smk"
 include: "rules/direct_binding.smk"
@@ -18,6 +19,7 @@ rule all:
     rules.collect_stats.output.json,
     rules.figures.output,
     rules.local_r_info.output,
+
 
 
   

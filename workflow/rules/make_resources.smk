@@ -65,3 +65,9 @@ rule make_txdb:
         txdb = "results/resources/txdb",
     script:
         "../scripts/resource_making/make_txdb.R"
+
+rule get_zad_genes:
+    output:
+        tsv = "results/resources/zad_genes.tsv"
+    script:
+        "../scripts/resource_making/get_zad_genes.R"
