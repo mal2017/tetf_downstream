@@ -40,7 +40,7 @@ rule figure2:
 
 rule figure2_supp1:
   input:
-    pirna_hist = rules.plot_pirna_score_hist.output.rds,
+    #pirna_hist = rules.plot_pirna_score_hist.output.rds,
     gg_gsea_table = rules.plot_gene_group_gsea_table.output.png,
   output:
     pdf = "results/figures/figure2_supp1.pdf"

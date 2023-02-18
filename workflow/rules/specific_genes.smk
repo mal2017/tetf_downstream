@@ -6,19 +6,9 @@ rule plot_pirna_genes_in_lms:
         rds = "results/plots/pirna_genes_in_lms.rds",
         #stats_rds = "results/analysis/specific_genes/pirna_genes_in_lms.rds",
         png = "results/plots/pirna_genes_in_lms.png",
-        json = "results/stats/pirna_genes_in_lms.json",
+        json = touch("results/stats/pirna_genes_in_lms.json"), # temporarily just touch
     script:
         "../scripts/specific_genes/plot_piRNA_genes_in_lms.R"
-
-rule plot_pirna_score_hist:
-    input:
-        mods = config.get("MERGED_MODELS"),
-        pirna = rules.make_pirna_gene_list.output.tsv
-    output:
-        rds = "results/plots/pirna_score_hist.rds",
-        png = "results/plots/pirna_score_hist.png",
-    script:
-        "../scripts/specific_genes/plot_piRNA_score_hist.R"
 
 rule plot_pirna_genes_in_our_kd:
     input:
