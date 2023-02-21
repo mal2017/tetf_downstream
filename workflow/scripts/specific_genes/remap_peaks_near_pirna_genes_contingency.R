@@ -56,7 +56,7 @@ all_genes <- genes(txdb) %>%
 # remove genes way in the middle of hetchrom that don't have peaks near them - this makes the
 # below test more realistic
 all_genes <- all_genes %>% 
-  add_nearest_distance(.,y=remap) %>%
+  add_nearest_distance(.,y=remap0) %>%
   filter(distance < 1000)
 
 
